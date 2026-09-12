@@ -2,21 +2,39 @@ import SwiftUI
 import AppKit
 import Combine
 
+enum WindowLayout {
+    static let controlsWidth: CGFloat = 280
+    static let dividerWidth: CGFloat = 1
+    static let diagnosticsHeight: CGFloat = 90
+    static let minimumImageSide: CGFloat = 560
+    static let preferredImageSide: CGFloat = 800
+
+    static func contentSize(imageSide: CGFloat) -> NSSize {
+        NSSize(width: imageSide + controlsWidth + dividerWidth,
+               height: imageSide + diagnosticsHeight)
+    }
+}
+
 // Explicit AppKit window ownership avoids dependence on saved SwiftUI scene state.
 // The content, inspector, alerts, and live diagnostics remain SwiftUI.
-@MainActor final class ApplicationDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
+@MainActor final class ApplicationDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate, NSWindowDelegate {
     private let model = SimulationModel()
     private var window: NSWindow?
     private let runButton = NSButton(), resetButton = NSButton()
     private var subscriptions = Set<AnyCancellable>()
     private let runID = NSToolbarItem.Identifier("simulation.run")
     private let resetID = NSToolbarItem.Identifier("simulation.reset")
+    func applicationDidFinishLaunching(_ notification: Notification) { showWindow() }
     func showWindow() {
         if let window { window.makeKeyAndOrderFront(nil); return }
-        let window = NSWindow(contentRect:NSRect(x:0,y:0,width:1280,height:900),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
+        let window = NSWindow(contentRect:NSRect(origin:.zero,size:WindowLayout.contentSize(imageSide:WindowLayout.preferredImageSide)),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
         window.title = "Turbulence Lab"
-        window.contentViewController = NSHostingController(rootView:ContentView(model:model))
-        window.contentMinSize = NSSize(width:1050,height:720)
+        let hostingController = NSHostingController(rootView:ContentView(model:model))
+        // AppKit owns the outer size; SwiftUI lays out the square image inside it.
+        hostingController.sizingOptions = []
+        window.contentViewController = hostingController
+        window.contentMinSize = WindowLayout.contentSize(imageSide:WindowLayout.minimumImageSide)
+        window.delegate = self
         window.appearance = NSAppearance(named:.darkAqua)
         window.isReleasedWhenClosed = false
         let toolbar = NSToolbar(identifier:"TurbulenceLab.controls")
@@ -29,8 +47,47 @@ import Combine
             self?.runButton.isEnabled = !loading;self?.resetButton.isEnabled = !loading
         }.store(in:&subscriptions)
         installMenus()
-        window.center();window.makeKeyAndOrderFront(nil)
+        if let screen = NSScreen.main ?? NSScreen.screens.first {
+            let available = screen.visibleFrame.insetBy(dx:24,dy:24)
+            let content = window.contentRect(forFrameRect:available)
+            let side = min(WindowLayout.preferredImageSide,
+                           content.width - WindowLayout.controlsWidth - WindowLayout.dividerWidth,
+                           content.height - WindowLayout.diagnosticsHeight)
+            window.setContentSize(WindowLayout.contentSize(imageSide:side))
+            window.contentView?.layoutSubtreeIfNeeded()
+            // NSWindow.center() uses an optical vertical offset. Use the actual
+            // visible-screen midpoint, after the toolbar and content are sized.
+            window.setFrameOrigin(NSPoint(x:screen.visibleFrame.midX - window.frame.width / 2,
+                                          y:screen.visibleFrame.midY - window.frame.height / 2))
+        }
+        window.makeKeyAndOrderFront(nil)
         NSApplication.shared.activate(ignoringOtherApps:true)
+    }
+    func windowWillResize(_ sender: NSWindow, to frameSize: NSSize) -> NSSize {
+        guard !sender.styleMask.contains(.fullScreen) else { return frameSize }
+        let content = sender.contentRect(forFrameRect:NSRect(origin:.zero,size:frameSize))
+        // Follow the edge being dragged. The inspector/footer keep their readable
+        // sizes while both dimensions of the simulation grow by the same amount.
+        let widthChange = abs(frameSize.width - sender.frame.width)
+        let heightChange = abs(frameSize.height - sender.frame.height)
+        var side = widthChange > heightChange
+            ? content.width - WindowLayout.controlsWidth - WindowLayout.dividerWidth
+            : content.height - WindowLayout.diagnosticsHeight
+        side = max(WindowLayout.minimumImageSide, side)
+        if let screen = sender.screen {
+            let available = sender.contentRect(forFrameRect:screen.visibleFrame)
+            side = min(side, available.width - WindowLayout.controlsWidth - WindowLayout.dividerWidth,
+                       available.height - WindowLayout.diagnosticsHeight)
+        }
+        return sender.frameRect(forContentRect:NSRect(origin:.zero,size:WindowLayout.contentSize(imageSide:side))).size
+    }
+    func windowWillUseStandardFrame(_ window: NSWindow, defaultFrame newFrame: NSRect) -> NSRect {
+        let content = window.contentRect(forFrameRect:newFrame)
+        let side = min(content.width - WindowLayout.controlsWidth - WindowLayout.dividerWidth,
+                       content.height - WindowLayout.diagnosticsHeight)
+        let size = window.frameRect(forContentRect:NSRect(origin:.zero,size:WindowLayout.contentSize(imageSide:side))).size
+        return NSRect(x:newFrame.midX - size.width / 2,y:newFrame.midY - size.height / 2,
+                      width:size.width,height:size.height)
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool { true }
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool { showWindow();return true }
@@ -84,7 +141,7 @@ import Combine
         } else {
             let app=NSApplication.shared
             app.setActivationPolicy(.regular)
-            let delegate=ApplicationDelegate();app.delegate=delegate;delegate.showWindow()
+            let delegate=ApplicationDelegate();app.delegate=delegate
             if CommandLine.arguments.contains("--ui-benchmark") {
                 let args=CommandLine.arguments
                 let index=args.firstIndex(of:"--duration")

@@ -32,6 +32,8 @@ Raw current data: [256 fixed](Benchmarks/release-fixed-256.csv), [512 fixed](Ben
 
 One 15-second run per grid, same decaying/seed/viscosity/drag settings, fixed dt=0.002 and batch 4. Content area is 1280×900 points; the actual MTKView drawable is **1620×1620 pixels**. These runs include the native interface, window server, Retina rendering and presentation. FPS is averaged from actual drawable presentation timestamps. Simulated intervals differ because the app runs uncapped.
 
+These recorded UI measurements predate the fitted window layout. Current launches size the window around a square image that fits the screen, so new visible-app runs can use a different drawable size.
+
 | Grid | ms/step | steps/s | R_turbo | Presented FPS |
 |---|---:|---:|---:|---:|
 | 256² | 0.2148 | 4656.2 | **9.3125** | 58.65 |

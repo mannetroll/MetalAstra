@@ -8,7 +8,7 @@ The complete solver, four presets, four visualization fields, seeded initializat
 
 1. Open **`TurbulenceLab.xcodeproj`** in Xcode.
 2. Select **TurbulenceLab → My Mac** and run (`⌘R`). The shared scheme uses Release for interactive performance.
-3. The window starts with a seeded vortex gas. Drag in the field to stir it.
+3. The window opens centered, fitted around the square simulation image. Resize it to scale the image without surrounding padding. Drag in the field to stir the seeded vortex gas.
 
 Requires Apple Silicon, macOS 15 or later, Xcode with its Metal compiler component installed. Verified with Xcode 26.3 on macOS 15.7.9. All third-party headers and licenses are vendored; opening/building requires no dependency downloads or package manager. If Xcode reports a missing Metal toolchain, install it from Xcode Settings → Components, or run `xcodebuild -downloadComponent MetalToolchain`.
 
@@ -82,7 +82,7 @@ MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1 \
   build/Build/Products/Release/TurbulenceLab.app/Contents/MacOS/TurbulenceLab --self-test
 ```
 
-`./scripts/ui-smoke.sh` exercises first launch, pause/resume, resizing, fields/palettes, contours, vortex input, preset resets and grid reconstruction. Its preview combines a cached native view hierarchy with the exact completed GPU field; it is a layout verification artifact, not a desktop screenshot.
+`./scripts/ui-smoke.sh` exercises centered startup, square image layout, resizing/zoom, pause/resume, fields/palettes, contours, vortex input, preset resets and grid reconstruction. Its previews (`app-preview.png` and `app-preview.minimum.png`) combine a cached native view hierarchy with the exact completed GPU field; they are layout verification artifacts, not desktop screenshots.
 
 ## Performance
 
@@ -101,7 +101,7 @@ build/Build/Products/Release/TurbulenceLab.app/Contents/MacOS/TurbulenceLab \
 build/Build/Products/Release/TurbulenceLab.app/Contents/MacOS/TurbulenceLab \
   --benchmark --size 1024 --steps 2400 --repeats 3 --cfl --dt 0.02
 
-# Actual visible app, including Retina presentation, with a 1280×900 content area:
+# Actual visible app, including Retina presentation, with the window fitted to the screen:
 : > Benchmarks/my-ui-run.txt
 open -n -W --stdout "$PWD/Benchmarks/my-ui-run.txt" \
   build/Build/Products/Release/TurbulenceLab.app \

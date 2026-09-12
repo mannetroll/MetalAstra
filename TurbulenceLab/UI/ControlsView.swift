@@ -45,7 +45,7 @@ struct ControlsView: View {
                     Text("Drag to add a positive vortex.\nRight-drag to add a negative vortex.").font(.caption).foregroundStyle(.secondary)
                 }
             }.padding(20)
-        }.frame(width:280).background(Color(nsColor:.controlBackgroundColor).opacity(0.72))
+        }.frame(minWidth:WindowLayout.controlsWidth,maxWidth:.infinity).background(Color(nsColor:.controlBackgroundColor).opacity(0.72))
         .onChange(of:model.config.viscosity) { _,_ in model.update() }
         .onChange(of:model.config.drag) { _,_ in model.update() }
         .onChange(of:model.config.dt) { _,_ in model.update() }

@@ -8,6 +8,14 @@ import Metal
             guard let window = NSApplication.shared.windows.first(where: { $0.contentView != nil }) else { throw LabError.message("No application window") }
             window.makeKeyAndOrderFront(nil)
             try await wait { model.metrics.physical.steps > 0 }
+            guard let screen = window.screen,
+                  abs(window.frame.midX - screen.visibleFrame.midX) <= 1,
+                  abs(window.frame.midY - screen.visibleFrame.midY) <= 1,
+                  screen.visibleFrame.contains(window.frame) else {
+                throw LabError.message("Startup window is not centered inside the visible screen: \(window.frame)")
+            }
+            try verifyLayout(window)
+            print("PASS centered startup and square image without padding: \(window.frame)")
             print("PASS native window and live simulation")
             guard let runButton = window.toolbar?.items.first(where: { $0.itemIdentifier.rawValue == "simulation.run" })?.view as? NSButton else { throw LabError.message("Native run toolbar button missing") }
             runButton.performClick(nil)
@@ -17,10 +25,28 @@ import Metal
             try await Task.sleep(nanoseconds:300_000_000)
             guard model.metrics.physical.steps == paused else { throw LabError.message("Pause did not drain outstanding work") }
             print("PASS pause drains outstanding simulation")
-            for size in [NSSize(width:1050,height:720),NSSize(width:1500,height:950),NSSize(width:1280,height:900)] {
-                window.setContentSize(size);try await Task.sleep(nanoseconds:100_000_000)
+            let startupSize = window.frame.size
+            for (index, size) in [window.minSize,
+                                 NSSize(width:window.frame.width + 180,height:window.frame.height),
+                                 NSSize(width:window.frame.width,height:window.frame.height - 100),
+                                 startupSize].enumerated() {
+                let fitted = window.delegate?.windowWillResize?(window,to:size) ?? size
+                window.setFrame(NSRect(origin:window.frame.origin,size:fitted),display:true)
+                try await Task.sleep(nanoseconds:100_000_000)
+                try verifyLayout(window)
+                if index == 0 {
+                    let minimumOutput = URL(fileURLWithPath:output).deletingPathExtension().appendingPathExtension("minimum.png").path
+                    try capture(window:window,engine:model.engine,path:minimumOutput)
+                }
             }
-            print("PASS native window resizing")
+            print("PASS minimum size and horizontal/vertical resizing without image padding")
+            window.performZoom(nil)
+            try await Task.sleep(nanoseconds:300_000_000)
+            try verifyLayout(window)
+            window.performZoom(nil)
+            try await Task.sleep(nanoseconds:300_000_000)
+            try verifyLayout(window)
+            print("PASS zoom and restore without image padding")
             for field in UInt32(0)...3 {
                 model.display.field = field;model.display.palette = field;model.display.contours = field%2
                 try await Task.sleep(nanoseconds:100_000_000)
@@ -63,6 +89,22 @@ import Metal
         if let view = view as? FlowView { return view }
         for child in view.subviews { if let found = findFlow(child) { return found } }
         return nil
+    }
+    static func verifyLayout(_ window:NSWindow) throws {
+        guard let content = window.contentView, let flow = findFlow(content) else {
+            throw LabError.message("MTKView missing from window")
+        }
+        content.layoutSubtreeIfNeeded()
+        let rect = flow.convert(flow.bounds,to:content)
+        let top = content.isFlipped ? rect.minY : rect.maxY
+        let contentTop = content.isFlipped ? content.bounds.minY : content.bounds.maxY
+        guard abs(rect.width - rect.height) <= 1,
+              abs(rect.minX - content.bounds.minX) <= 1,
+              abs(top - contentTop) <= 1,
+              abs(content.bounds.width - rect.maxX - 281) <= 1,
+              abs(content.bounds.height - rect.height - 90) <= 1 else {
+            throw LabError.message("Image must be square and flush with the window, inspector and diagnostics: image \(rect), content \(content.bounds)")
+        }
     }
     static func capture(window:NSWindow,engine:SimulationEngine,path:String) throws {
         guard let root = window.contentView?.superview, let flow = findFlow(root), let bitmap = root.bitmapImageRepForCachingDisplay(in:root.bounds), let (r,exchange) = engine.renderResources(), let slot = exchange.acquire() else { throw LabError.message("UI capture resources unavailable") }

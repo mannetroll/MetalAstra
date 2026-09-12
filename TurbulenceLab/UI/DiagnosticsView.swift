@@ -2,7 +2,7 @@ import SwiftUI
 struct DiagnosticsView: View {
     let metrics: LiveMetrics
     var body: some View {
-        HStack(spacing:24) {
+        HStack(spacing:16) {
             metric("PHYSICAL / WALL",String(format:"%.2f×",metrics.turbo),accent:true)
             metric("STEPS / S",String(format:"%.1f",metrics.stepsPerSecond))
             metric("MS / STEP",String(format:"%.2f",metrics.milliseconds))
