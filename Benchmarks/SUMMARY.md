@@ -2,6 +2,21 @@
 
 These are measured runs, including exploratory configurations and prior builds. They are not all the same solver revision or workload. Use [CURRENT_BASELINE.md](../CURRENT_BASELINE.md) for the final Release baseline and [OPTIMIZATION_LOG.md](../OPTIMIZATION_LOG.md) for comparisons, validation, and caveats. GPU phase profiles are separate `.txt` files and are not throughput results.
 
+## 3/2-padded solver
+
+The [CFL study](CFL_STUDY.md) indexes the later adaptive-step stability/accuracy sweeps and paired native-app measurements. The selected interactive default is CFL 0.80; the fixed-dt runs below retain their original parameters.
+
+`padding-fixed-*.csv` records N spectral nodes and M = 3N/2 nonlinear nodes. These runs retain more spectral modes than the previous solver at the same N. Validation: [86 numerical checks](padding-numerical-tests.txt), [Metal API/shader validation](padding-metal-validation.txt), and [native UI smoke test](padding-ui-smoke.txt).
+
+| Spectral N | Nonlinear M | Steps/repeat | ms/step | Steps/s | R_turbo | R range |
+|---:|---:|---:|---:|---:|---:|---:|
+| [256](padding-fixed-256.csv) | 384 | 12000 | 0.3855 | 2593.9 | 5.1878 | 5.1665–5.2375 |
+| [512](padding-fixed-512.csv) | 768 | 6000 | 0.9379 | 1066.2 | 2.1323 | 2.1258–2.1630 |
+| [1024](padding-fixed-1024.csv) | 1536 | 2400 | 3.6198 | 276.3 | 0.5525 | 0.5508–0.5540 |
+| [2048](padding-fixed-2048.csv) | 3072 | 600 | 16.7225 | 59.8 | 0.1196 | 0.1193–0.1198 |
+
+## Historical 2/3-truncated solver
+
 | Raw file | Grid | Steps | Batch | Forward | Packed inverses | Threads | Display every | R median | R range | ms/step median | Repeats |
 |---|---:|---:|---:|---|---|---:|---:|---:|---:|---:|---:|
 | [01-packed.csv](01-packed.csv) | 1024² | 240 | 4 | C2C | yes | 256 | 1 | 1.074553 | 1.073894–1.079969 | 1.861241 | 3 |

@@ -7,14 +7,16 @@ enum Preset: UInt32, CaseIterable, Identifiable {
     var detail: String { ["Random phase eddies merge and decay", "Forty seeded vortices interact", "A periodic double shear rolls into billows", "Sustained stirring in the 8–12 wavenumber band"][Int(rawValue)] }
 }
 struct SimulationConfig {
+    // N spectral nodes per axis; nonlinear products use M = 3N/2 nodes.
     var size = 1024
-    var preset: Preset = .vortexGas
+    var paddedSize: Int { size * 3 / 2 }
+    var preset: Preset = .decaying
     var seed: UInt32 = 42
     var viscosity: Float = 0.0001
     var drag: Float = 0.01
     var dt: Float = 0.02
     var automatic = true
-    var cfl: Float = 0.45
+    var cfl: Float = 0.8
     var stepsPerBatch = 4
     var forcing: Float = 1
     var packed = true
@@ -43,8 +45,8 @@ struct LiveMetrics {
     var fps: Double = 0, averageFPS: Double = 0, gpuMilliseconds: Double = 0, cpuMilliseconds: Double = 0
 }
 struct DisplaySettings {
-    var field: UInt32 = 0, palette: UInt32 = 0
-    var exposure: Float = 0.6, contrast: Float = 1
+    var field: UInt32 = 0, palette: UInt32 = 1
+    var exposure: Float = -1.3, contrast: Float = 1
     var contours: UInt32 = 0
     var scale: Float = 1
     var padding0: UInt32 = 0, padding1: UInt32 = 0

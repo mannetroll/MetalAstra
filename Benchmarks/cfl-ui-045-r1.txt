@@ -1,0 +1,5 @@
+# spectral N=1024, nonlinear M=1536; 3/2 zero padding; zero Nyquist lines
+# CFL=0.45, automatic=true, dt_max=0.02
+UI BENCHMARK: size,wall_s,simulated_s,R_turbo,steps_s,ms_step,FPS,energy,enstrophy
+# drawable 1600x1600; FPS uses actual drawable presentation timestamps
+UI,1024,15.157658,7.667164,0.505828,268.379,3.726071,58.87,0.03291870,1.30792737

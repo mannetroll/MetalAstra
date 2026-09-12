@@ -10,8 +10,9 @@ struct ControlsView: View {
                     Picker("Preset",selection:$model.config.preset) { ForEach(Preset.allCases) { Text($0.title).tag($0) } }.labelsHidden()
                         .onChange(of:model.config.preset) { _,_ in model.reset() }
                     Text(model.config.preset.detail).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
-                    Picker("Grid",selection:$model.config.size) { ForEach([256,512,1024,2048],id:\.self) { Text("\($0) × \($0)").tag($0) } }
+                    Picker("Spectral grid",selection:$model.config.size) { ForEach([256,512,1024,2048],id:\.self) { Text("\($0) × \($0)").tag($0) } }
                         .onChange(of:model.config.size) { _,_ in model.reset() }
+                    Text("\(model.config.paddedSize) × \(model.config.paddedSize) nonlinear grid · 3/2 padding").font(.caption2).foregroundStyle(.secondary)
                     HStack { Text("Seed"); Spacer(); TextField("Seed",value:$model.config.seed,format:.number).frame(width:95).multilineTextAlignment(.trailing).onSubmit { model.reset() } }
                 }
                 VStack(alignment:.leading,spacing:12) {
@@ -20,7 +21,7 @@ struct ControlsView: View {
                     numeric("Linear drag α",value:$model.config.drag,range:0...0.15,format:"%.3f")
                     numeric("Maximum dt",value:$model.config.dt,range:0.0002...0.02,format:"%.4f")
                     Toggle("Automatic CFL",isOn:$model.config.automatic)
-                    if model.config.automatic { numeric("CFL number",value:$model.config.cfl,range:0.1...0.65,format:"%.2f") }
+                    if model.config.automatic { numeric("CFL number",value:$model.config.cfl,range:0.1...0.82,format:"%.2f") }
                     if model.config.preset == .inverseCascade { numeric("Forcing",value:$model.config.forcing,range:0...4,format:"%.2f") }
                     Picker("Steps / batch",selection:$model.config.stepsPerBatch) { ForEach([1,2,4,8,16],id:\.self) { Text("\($0)").tag($0) } }
                     Text("Fixed dt also respects the explicit diffusion limit.").font(.caption2).foregroundStyle(.tertiary)

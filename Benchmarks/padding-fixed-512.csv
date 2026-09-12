@@ -1,0 +1,6 @@
+# spectral N=512, nonlinear M=768; 3/2 zero padding; zero Nyquist lines
+# forward transform: R2C
+device,size,steps,batch,packed,threads,displayEvery,rendered,repeat,wall_s,ms_step,steps_s,R_turbo,gpu_span_ms_step,cpu_encode_ms_step,energy,enstrophy,dt
+Apple M1 Max,512,6000,4,yes,256,1,yes,1,5.627644,0.937941,1066.165,2.132331,0.937632,0.012553,0.02928170,0.86210680,0.0020000
+Apple M1 Max,512,6000,4,yes,256,1,yes,2,5.547842,0.924640,1081.502,2.163003,0.924578,0.012750,0.02928170,0.86210680,0.0020000
+Apple M1 Max,512,6000,4,yes,256,1,yes,3,5.644812,0.940802,1062.923,2.125846,0.940742,0.012306,0.02928170,0.86210680,0.0020000

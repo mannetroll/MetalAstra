@@ -8,7 +8,7 @@ The complete solver, four presets, four visualization fields, seeded initializat
 
 1. Open **`TurbulenceLab.xcodeproj`** in Xcode.
 2. Select **TurbulenceLab → My Mac** and run (`⌘R`). The shared scheme uses Release for interactive performance.
-3. The window opens centered, fitted around the square simulation image. Resize it to scale the image without surrounding padding. Drag in the field to stir the seeded vortex gas.
+3. The window opens centered, fitted around the square simulation image, with Decaying turbulence, the Inferno palette, and exposure −1.3. Resize it to scale the image without surrounding padding. Drag in the field to stir the flow.
 
 Requires Apple Silicon, macOS 15 or later, Xcode with its Metal compiler component installed. Verified with Xcode 26.3 on macOS 15.7.9. All third-party headers and licenses are vendored; opening/building requires no dependency downloads or package manager. If Xcode reports a missing Metal toolchain, install it from Xcode Settings → Components, or run `xcodebuild -downloadComponent MetalToolchain`.
 
@@ -27,10 +27,10 @@ A signing team is unnecessary for the command-line build above. Xcode can use lo
 - **Space / Start / Pause** controls advancement. Pausing drains the already submitted work.
 - **⌘R / Reset** rebuilds the selected seeded flow.
 - **Preset:** decaying turbulence, vortex gas, Kelvin–Helmholtz double shear, or forced inverse cascade.
-- **Grid:** 256², 512², 1024², 2048². The last is a stress configuration.
+- **Spectral grid:** N = 256, 512, 1024, or 2048 per axis. Nonlinear evaluation uses M = 3N/2: 384, 768, 1536, or 3072 per axis. The inspector shows both sizes; N = 2048 is a stress configuration.
 - **Seed:** edit and press Return to regenerate a reproducible field.
 - **Viscosity, drag, forcing:** update the GPU dynamics live.
-- **Maximum dt / Automatic CFL:** automatic mode computes a fresh velocity bound on the GPU every step. Fixed mode still enforces the explicit diffusion limit, but the user must choose an advectively stable dt.
+- **Maximum dt / Automatic CFL:** automatic mode computes a fresh velocity bound on the GPU every step. CFL defaults to **0.80**, with an inspector range of 0.10–0.82 and a maximum-dt default of 0.02. Fixed mode still enforces the explicit diffusion limit, but the user must choose an advectively stable dt. [The CFL study](Benchmarks/CFL_STUDY.md) records stability and accuracy limits.
 - **Steps / batch:** 1, 2, 4, 8, or 16. More work per submission can improve throughput and increase interaction latency. Four is the interactive default.
 - **Field:** vorticity, velocity magnitude, streamfunction, enstrophy density. Field-specific fixed unit scales keep small streamfunction values visible.
 - **Palette:** Ice/Fire, Inferno, Turbo, Neon; exposure, contrast, and optional contour bands affect rendering only.
@@ -51,13 +51,13 @@ On the periodic domain `[0,2π)²`:
 ∇²ψ = −ω,     u = ∂yψ,     v = −∂xψ
 ```
 
-The primary state is complex spectral vorticity. With the forward convention `exp(-i k·x)`, `ψ̂ = ω̂/k²`, `û = i ky ψ̂`, and `v̂ = -i kx ψ̂`. VkFFT normalizes inverse transforms by `1/N²`. The zero mode is explicitly removed.
+The primary state is complex spectral vorticity on an **N×N spectral grid**. With the forward convention `exp(-i k·x)`, `ψ̂ = ω̂/k²`, `û = i ky ψ̂`, and `v̂ = -i kx ψ̂`. VkFFT normalizes inverse transforms by the transform's grid size squared. The zero mode and even-grid Nyquist rows/columns are explicitly removed; all modes with `|kx|, |ky| < N/2` otherwise remain available.
 
-A strict rectangular 2/3 mask retains only modes satisfying `3|kx| < N` and `3|ky| < N`. Inputs to the nonlinear product and every RK stage result are projected, so the transformed nonlinear product cannot alias back into retained modes. SSP-RK3 advances advection, viscosity, drag, and stage-time forcing, using only original/current state buffers.
+**3/2 zero padding** removes quadratic aliasing. At every RK stage, signed spectral modes are embedded in an **M×M grid, M = 3N/2**, and multiplied by `(M/N)²` before the inverse FFTs. Nonlinear products are computed there, transformed forward, cropped back to N×N, and multiplied by `(N/M)²`. For N = 1024, the nonlinear FFTs are 1536×1536. The former 2/3 spectral cutoff is no longer used. SSP-RK3 advances advection, viscosity, drag, and stage-time forcing, using only original/current state buffers.
 
 The optimized nonlinear evaluation packs two real fields into each complex inverse FFT: `(u,v)` and `(∂xω,∂yω)`. Its real nonlinear product uses an in-place **R2C forward transform**, and the RK kernel reconstructs the negative-x half through Hermitian symmetry. That is **six C2C inverse transforms and three R2C forward transforms per timestep**. The full C2C and five-transform reference paths remain available for tests and benchmark comparisons.
 
-The GPU chooses dt from the user ceiling, a conservative SSP-RK3 diffusion bound, and optionally `CFL*Δx/max(|u|+|v|)`. No per-step CPU readback is needed. A compensated GPU clock avoids accumulating Float32 time-summation drift. Kinetic energy and enstrophy are spatial means, not domain integrals.
+The GPU chooses dt from the user ceiling, a conservative SSP-RK3 diffusion bound using `K = N/2−1`, and optionally `CFL*(2π/M)/max(|u|+|v|)`, with the velocity bound reduced over the padded grid. No per-step CPU readback is needed. Display and physical diagnostics use the N×N grid. A compensated GPU clock avoids accumulating Float32 time-summation drift. Kinetic energy and enstrophy are spatial means, not domain integrals.
 
 Forced inverse cascade uses seeded, Hermitian, spatially random forcing in `8 ≤ |k| ≤ 12` with smooth time correlations. It is not a white-noise stochastic integrator. See [ARCHITECTURE.md](ARCHITECTURE.md) for equations, layout, memory lifetimes, forcing, and synchronization details.
 
@@ -73,7 +73,7 @@ Or run the built app's numerical suite directly:
 build/Build/Products/Release/TurbulenceLab.app/Contents/MacOS/TurbulenceLab --self-test
 ```
 
-The Xcode test target runs **72 deterministic numerical checks** across both FFT paths: complex FFT roundtrip, derivatives, Laplacian, Poisson inversion, velocity signs, divergence, zero mode, dealiasing, seeded initialization, inviscid energy/enstrophy conservation, viscous decay, 700-step finite evolution, compensated clock, RK convergence, Parseval diagnostics, packed/unpacked agreement, a separate Double DFT/RK3 CPU reference, all presets, CFL, vortex injection, fault detection, and C2C/R2C comparisons through 2048².
+The Xcode test target runs **86 deterministic numerical checks** across both FFT paths: N-grid and mixed-radix padded FFT roundtrips, signed-mode placement and scaling, high-mode retention, Nyquist handling, derivatives, Laplacian, Poisson inversion, velocity signs, divergence, zero mode, seeded initialization, inviscid conservation, viscous decay, 700-step finite evolution, compensated clock, RK convergence, Parseval diagnostics, packed/unpacked agreement, an independent Double DFT plus exact spectral convolution/RK3 reference, alias-prone high-mode interactions, all presets, full-band diffusion bounds, CFL, vortex injection, fault detection, and C2C/R2C comparisons through N = 2048 (M = 3072).
 
 Metal API and shader validation were also run successfully:
 
@@ -88,7 +88,9 @@ MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1 \
 
 The primary metric is **`R_turbo = T_simulated / T_wall`**. It includes the real solver, GPU CFL reduction, diagnostics, field conversion, rendering, CPU encoding, submission/backpressure and completion costs. FFT plan creation and warm-up are excluded. The interactive metric excludes explicit pauses after outstanding work drains.
 
-[CURRENT_BASELINE.md](CURRENT_BASELINE.md) records the final measured M1 Max results and exact configuration. [OPTIMIZATION_LOG.md](OPTIMIZATION_LOG.md) records before/after experiments, kept/reverted choices, and unresolved candidates. [The complete measurement index](Benchmarks/SUMMARY.md) links every recorded configuration and raw result.
+[CURRENT_BASELINE.md](CURRENT_BASELINE.md) distinguishes the current solver from the recorded M1 Max measurements. Earlier 2/3-truncated timings describe a different resolution and workload from the 3/2-padded solver. [OPTIMIZATION_LOG.md](OPTIMIZATION_LOG.md) records experiments and numerical changes. [The complete measurement index](Benchmarks/SUMMARY.md) links recorded configurations and raw results.
+
+`./scripts/cfl-study.sh` reproduces the matched-time CFL stability/accuracy search. `./scripts/cfl-ui-benchmark.sh` compares CFL 0.45 and 0.80 with three paired native-app runs. The study's synchronized verification timings are separate from production throughput. Use `--cfl-value C` for a chosen automatic CFL in CLI or UI benchmarks; larger experimental values are allowed in the CLI.
 
 ```sh
 ./scripts/benchmark.sh

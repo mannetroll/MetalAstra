@@ -135,7 +135,7 @@ enum WindowLayout {
 }
 @main enum EntryPoint {
     @MainActor static func main() {
-        if CommandLine.arguments.contains("--self-test") || CommandLine.arguments.contains("--benchmark") || CommandLine.arguments.contains("--profile") || CommandLine.arguments.contains("--snapshot") {
+        if CommandLine.arguments.contains("--self-test") || CommandLine.arguments.contains("--benchmark") || CommandLine.arguments.contains("--profile") || CommandLine.arguments.contains("--snapshot") || CommandLine.arguments.contains("--cfl-study") {
             do { try autoreleasepool { try CommandLineRunner.run() } }
             catch { fputs("ERROR: \(error.localizedDescription)\n",stderr);exit(1) }
         } else {

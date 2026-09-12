@@ -1,0 +1,9 @@
+PASS centered startup and square image without padding: (342.0, 68.0, 1081.0, 942.0)
+PASS native window and live simulation
+PASS pause drains outstanding simulation
+PASS minimum size and horizontal/vertical resizing without image padding
+PASS zoom and restore without image padding
+PASS four fields, four palettes, contours and vortex input
+PASS preset changes and grid reconstruction
+PASS resume and native view/GPU image capture: /tmp/metalastra-padding-preview.png
+ALL UI SMOKE CHECKS PASSED

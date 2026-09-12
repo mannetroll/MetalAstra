@@ -19,7 +19,8 @@ kernel void coefficients(device float4 *coef [[buffer(0)]], device float2 *forci
     int x = i%p.n, y=i/p.n;
     int kx=x<=int(p.n/2)?x:x-int(p.n), ky=y<=int(p.n/2)?y:y-int(p.n);
     float k2 = float(kx*kx+ky*ky);
-    bool keep = abs(kx)*3 < int(p.n) && abs(ky)*3 < int(p.n) && k2>0;
+    // Keep the full spectral band except the even-grid Nyquist lines and mean.
+    bool keep = abs(kx) < int(p.n/2) && abs(ky) < int(p.n/2) && k2>0;
     coef[i] = float4(kx,ky,k2>0?1.f/k2:0.f,keep?1.f:0.f);
     uint mirror = ((p.n-y)%p.n)*p.n+(p.n-x)%p.n;
     uint key = min(i,mirror) ^ p.seed;
@@ -53,29 +54,44 @@ kernel void initializeField(device float2 *w [[buffer(0)]], constant Params &p [
     w[i]=float2(value,0);
 }
 kernel void filterState(device float2 *w [[buffer(0)]], device const float4 *c [[buffer(1)]], constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
-    if(i<p.count) w[i] *= c[i].w;
+    if(i<p.count && c[i].w==0) w[i] = 0;
+}
+// Gather signed N-grid modes into the M=3N/2 FFT grid, clearing every other
+// entry on every stage. Scale by M²/N² for VkFFT's normalized inverse.
+inline int unpaddedIndex(uint i, uint n) {
+    int m=int(n*3/2),x=int(i)%m,y=int(i)/m;
+    int kx=x<=m/2?x:x-m,ky=y<=m/2?y:y-m;
+    if(abs(kx)>=int(n/2) || abs(ky)>=int(n/2)) return -1;
+    return (ky<0?ky+int(n):ky)*int(n)+(kx<0?kx+int(n):kx);
 }
 kernel void derivePacked(device const float2 *w [[buffer(0)]], device const float4 *c [[buffer(1)]], device float2 *velocity [[buffer(2)]], device float2 *gradient [[buffer(3)]], constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
-    if(i>=p.count) return;
-    float4 k=c[i]; float2 z=w[i]*k.w;
+    uint m=p.n*3/2;if(i>=m*m) return;
+    int j=unpaddedIndex(i,p.n);
+    velocity[i]=0;gradient[i]=0;
+    if(j<0 || c[j].w==0) return;
+    float4 k=c[j]; float2 z=w[j]*(float(m*m)/float(p.count));
     velocity[i]=cmul(float2(k.x,k.y)*k.z,z); // u_hat + i v_hat
     gradient[i]=cmul(float2(-k.y,k.x),z);    // wx_hat + i wy_hat
 }
 kernel void deriveSeparate(device const float2 *w [[buffer(0)]], device const float4 *c [[buffer(1)]], device float2 *u [[buffer(2)]], device float2 *v [[buffer(3)]], device float2 *dx [[buffer(4)]], device float2 *dy [[buffer(5)]], constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
-    if(i>=p.count) return;
-    float4 k=c[i];float2 iz=float2(-w[i].y,w[i].x)*k.w;
+    uint m=p.n*3/2;if(i>=m*m) return;
+    int j=unpaddedIndex(i,p.n);
+    u[i]=0;v[i]=0;dx[i]=0;dy[i]=0;
+    if(j<0 || c[j].w==0) return;
+    float4 k=c[j];float2 iz=float2(-w[j].y,w[j].x)*(float(m*m)/float(p.count));
     u[i]=iz*k.y*k.z;v[i]=-iz*k.x*k.z;dx[i]=iz*k.x;dy[i]=iz*k.y;
 }
 kernel void nonlinear(device const float2 *u [[buffer(0)]], device const float2 *g [[buffer(1)]], device float2 *rhs [[buffer(2)]], device float *maxima [[buffer(3)]], device const float2 *dx [[buffer(4)]], device const float2 *dy [[buffer(5)]], constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]], uint lid [[thread_index_in_threadgroup]], uint group [[threadgroup_position_in_grid]], uint width [[threads_per_threadgroup]]) {
     threadgroup float speeds[512];
+    uint m=p.n*3/2;
     float2 vel=0,grad=0;
-    if(i<p.count) {
+    if(i<m*m) {
         vel=p.packed?u[i]:float2(u[i].x,g[i].x); grad=p.packed?g[i]:float2(dx[i].x,dy[i].x);
         if(p.realFFT) {
             device float *real=reinterpret_cast<device float *>(rhs);
-            uint row=(i/p.n)*(p.n+2),x=i%p.n;
+            uint row=(i/m)*(m+2),x=i%m;
             real[row+x]=-dot(vel,grad);
-            if(x==0) { real[row+p.n]=0;real[row+p.n+1]=0; }
+            if(x==0) { real[row+m]=0;real[row+m+1]=0; }
         } else { rhs[i]=float2(-dot(vel,grad),0); }
     }
     speeds[lid]=all(isfinite(vel)) && all(isfinite(grad)) ? abs(vel.x)+abs(vel.y) : INFINITY;
@@ -89,9 +105,9 @@ kernel void chooseDT(device const float *maxima [[buffer(0)]], device Clock *clo
     values[lid]=v;threadgroup_barrier(mem_flags::mem_threadgroup);
     for(uint s=width/2;s>0;s/=2) { if(lid<s) values[lid]=max(values[lid],values[lid+s]); threadgroup_barrier(mem_flags::mem_threadgroup); }
     if(lid==0) {
-        float kmax=floor(float(p.n-1)/3.f);
+        float kmax=float(p.n/2-1);
         float limit=1.5f/max(p.viscosity*2*kmax*kmax+p.drag,1.e-10f);
-        float adv=p.cfl*(tau/p.n)/max(values[0],1.e-6f);
+        float adv=p.cfl*(tau/float(p.n*3/2))/max(values[0],1.e-6f);
         clock->dt=min(p.dt,limit);
         if(p.automatic) clock->dt=min(clock->dt,adv);
         if(!isfinite(values[0]) || !isfinite(clock->time)) { clock->fault=1;clock->dt=0; }
@@ -99,6 +115,7 @@ kernel void chooseDT(device const float *maxima [[buffer(0)]], device Clock *clo
 }
 kernel void rkUpdate(device float2 *w [[buffer(0)]], device float2 *base [[buffer(1)]], device const float2 *rhs [[buffer(2)]], device const float4 *c [[buffer(3)]], device const float2 *forcing [[buffer(4)]], device const Clock *clock [[buffer(5)]], constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
     if(i>=p.count) return;
+    if(c[i].w==0) { w[i]=0;if(p.stage==0) base[i]=0;return; }
     float2 z=w[i]; if(p.stage==0) base[i]=z;
     float k2=dot(c[i].xy,c[i].xy),dt=clock->dt;
     float t=clock->time+(p.stage==1?dt:(p.stage==2?dt*0.5f:0));
@@ -108,12 +125,15 @@ kernel void rkUpdate(device float2 *w [[buffer(0)]], device float2 *base [[buffe
         f=p.force*cos(t*(0.7f+0.01f*k2))*forcing[i];
     }
     float2 nonlinear;
+    uint m=p.n*3/2,x=i%p.n,y=i/p.n;
+    uint px=x<=p.n/2?x:x+m-p.n,py=y<=p.n/2?y:y+m-p.n;
     if(p.realFFT) {
-        uint x=i%p.n,y=i/p.n;
-        bool conjugate=x>p.n/2;
-        uint j=conjugate?((p.n-y)%p.n)*(p.n/2+1)+(p.n-x):y*(p.n/2+1)+x;
+        bool conjugate=px>m/2;
+        uint j=conjugate?((m-py)%m)*(m/2+1)+(m-px):py*(m/2+1)+px;
         nonlinear=rhs[j]; if(conjugate) nonlinear.y=-nonlinear.y;
-    } else { nonlinear=rhs[i]; }
+    } else { nonlinear=rhs[py*m+px]; }
+    // Crop the padded transform back to N-grid DFT normalization.
+    nonlinear *= float(p.count)/float(m*m);
     float2 next=z+dt*(nonlinear-(p.viscosity*k2+p.drag)*z+f);
     float a=p.stage==0?0.f:(p.stage==1?0.75f:1.f/3.f);
     w[i]=(a*base[i]+(1.f-a)*next)*c[i].w;

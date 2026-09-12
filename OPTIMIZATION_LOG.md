@@ -2,6 +2,18 @@
 
 Hardware: Apple M1 Max, 32 GPU cores, 64 GB unified memory, AC power. macOS 15.7.9 (24G830), Xcode 26.3 (17C529). Experiments were run on the local interactive machine, not an isolated performance appliance; small differences require caution. All numbers below are measured, not projected.
 
+## CFL timestep selection
+
+Raised the default CFL from 0.45 to **0.80**, with an inspector range of 0.10–0.82. A search of 97 candidate runs across 17 studies covered all presets, two seeds, matched-time reference comparisons, and inviscid high-mode stress through N = 2048. In the N = 1024 actual cutoff-mode test, 0.82 stayed close to the reference, 0.83 developed growing enstrophy and field error, and 0.835 crossed the failure threshold. The default viscous decaying flow alone completed t = 20 at 1.14 and failed at 1.16; those larger values are flow-specific.
+
+Three paired visible-app runs at N = 1024 measured median R_turbo **0.514694 → 0.949898 (+84.6%)**, with median presented FPS 59.35 → 58.50. Larger timesteps improve simulated time per wall second; FFT and RK kernels are unchanged. Each run lasts 15 wall seconds, so the higher setting also advances further into the decaying flow. Accuracy is assessed separately at matched physical times. Both XCTest cases and all 86 numerical checks pass with the new default. See the [complete CFL study, raw results, and reproduction commands](Benchmarks/CFL_STUDY.md).
+
+## Spectral resolution and 3/2 padding
+
+The solver now interprets N as the spectral resolution and uses M = 3N/2 for nonlinear FFTs. This replaces the original 2/3 cutoff; it changes the resolved band and workload, so the earlier optimization timings below are historical. N×N state/display grids are retained, while derivative and nonlinear workspaces use M×M. The pad/crop factors are 9/4 and 4/9 with VkFFT's normalized inverse. Nyquist lines and mean vorticity remain zero. CFL samples all M² velocities; diffusion uses K = N/2−1.
+
+The independent CPU reference now computes exact non-wrapping spectral convolution. All 86 checks pass, including modes above the old cutoff, alias-prone interactions, poisoned padding, mixed-radix FFTs, full padded-grid CFL reduction, conservation, RK convergence, and C2C/R2C agreement through N = 2048, M = 3072. Raw numerical verification is in [padding-numerical-tests.txt](Benchmarks/padding-numerical-tests.txt). The high-mode CPU comparison has maximum physical error 8.35e-7; the largest C2C/R2C difference across supported grids is 1.91e-6.
+
 ## Verified baseline and integration repairs
 
 Implemented Float32 spectral state, explicit SSP-RK3, strict 2/3 projection, private persistent buffers, a GPU CFL reduction on every step, and one compute encoder per submitted batch. Kept these as architectural requirements, without inventing an A/B speedup against an intentionally inefficient implementation.
@@ -76,6 +88,6 @@ The following covers the requested optimization areas without claiming unperform
 
 The remaining cost is predominantly FFT work and global-memory traffic in spectral/RK kernels. Further worthwhile experiments are full half-spectrum state layouts, reduced RK/workspace traffic, and hardware-counter guided scheduling. They require the same deterministic correctness and end-to-end comparisons before adoption.
 
-## Final self-review
+## Original 2/3 solver self-review
 
 Normal steps remain GPU-resident; only 32-byte completed diagnostics are read by Swift. Plans and large allocations are reused. No CPU waits occur between FFTs or stages. Both FFT normalization and Hermitian reconstruction are tested. The zero mode and strict 2/3 mask are applied at every necessary projection point. The renderer only acquires completed protected textures. CFL uses a fresh GPU reduction, independent of delayed diagnostics. Wall-time and simulated-time windows match; rendering FPS is separately measured. No CPU fallback, unimplemented solver branch, or claimed unmeasured performance remains.

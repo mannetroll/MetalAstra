@@ -21,6 +21,11 @@ import AppKit
             config.preset = .decaying; config.automatic = false; config.dt = 0.002
             if let i = args.firstIndex(of:"--size"), i+1<args.count, let n = Int(args[i+1]), [256,512,1024,2048].contains(n) { config.size = n }
             if let i = args.firstIndex(of:"--duration"), i+1<args.count, let t = Double(args[i+1]) { benchmarkDuration = max(3,t) }
+            if args.contains("--cfl") || args.contains("--cfl-value") { config.automatic=true;config.dt=0.02 }
+            if let i=args.firstIndex(of:"--cfl-value"),i+1<args.count,let value=Float(args[i+1]),value.isFinite,value>0 { config.cfl=value }
+            if let i=args.firstIndex(of:"--dt"),i+1<args.count,let value=Float(args[i+1]),value.isFinite,value>0 { config.dt=value }
+            print("# spectral N=\(config.size), nonlinear M=\(config.paddedSize); 3/2 zero padding; zero Nyquist lines")
+            print("# CFL=\(config.cfl), automatic=\(config.automatic), dt_max=\(config.dt)")
             print("UI BENCHMARK: size,wall_s,simulated_s,R_turbo,steps_s,ms_step,FPS,energy,enstrophy")
         }
         engine.report = { [weak self] metrics in Task { @MainActor in

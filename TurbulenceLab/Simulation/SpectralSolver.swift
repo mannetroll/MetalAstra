@@ -5,47 +5,52 @@ import Metal
 final class SpectralSolver {
     let resources: MetalResources
     let size: Int, count: Int, groupWidth: Int, groupCount: Int
+    let paddedSize: Int, paddedCount: Int, paddedGroupCount: Int
     let omega: MTLBuffer, base: MTLBuffer, velocity: MTLBuffer, gradient: MTLBuffer, rhs: MTLBuffer
     let coefficients: MTLBuffer, forcing: MTLBuffer, maxima: MTLBuffer, partial: MTLBuffer, clock: MTLBuffer
     let extraDX: MTLBuffer, extraDY: MTLBuffer
     let plan: FFTPlan
+    let paddedPlan: FFTPlan
     let realPlan: FFTPlan?
     let snapshots: SnapshotExchange
     var config: SimulationConfig
     var profile: [String: Double] = [:]
 
     init(resources r: MetalResources, config: SimulationConfig) throws {
-        guard config.size >= 16, config.size <= 2048, config.size.nonzeroBitCount == 1, [128,256,512].contains(config.threadgroup) else { throw LabError.message("Use a power-of-two grid from 16 to 2048 and a 128, 256 or 512 thread group.") }
+        guard config.size >= 16, config.size <= 2048, config.size.nonzeroBitCount == 1, [128,256,512].contains(config.threadgroup) else { throw LabError.message("Use a power-of-two spectral grid from 16 to 2048 and a 128, 256 or 512 thread group.") }
         self.resources = r; self.config = config; size = config.size; count = size*size
+        paddedSize = config.paddedSize; paddedCount = paddedSize*paddedSize
         groupWidth = config.threadgroup; groupCount = (count+groupWidth-1)/groupWidth
+        paddedGroupCount = (paddedCount+groupWidth-1)/groupWidth
         omega = try r.buffer(count*8, "Spectral vorticity")
         base = try r.buffer(count*8, "RK initial state")
-        velocity = try r.buffer(count*8, "Packed velocity / display omega-psi")
-        gradient = try r.buffer(count*8, "Packed gradients / display velocity")
-        rhs = try r.buffer(count*8, "Nonlinear physical / spectral RHS")
+        velocity = try r.buffer(paddedCount*8, "3/2 padded velocity / display omega-psi")
+        gradient = try r.buffer(paddedCount*8, "3/2 padded gradients / display velocity")
+        rhs = try r.buffer(paddedCount*8, "3/2 padded nonlinear physical / spectral RHS")
         coefficients = try r.buffer(count*16, "Immutable spectral coefficients")
         forcing = try r.buffer(count*8, "Hermitian forcing band")
-        maxima = try r.buffer(groupCount*4, "CFL partials")
+        maxima = try r.buffer(paddedGroupCount*4, "Padded-grid CFL partials")
         partial = try r.buffer(groupCount*16, "Diagnostic partials")
         clock = try r.buffer(32, "GPU compensated clock")
         // The five-transform reference path is allocated only when requested.
-        extraDX = try r.buffer(config.packed ? 8 : count*8, "Reference derivative x")
-        extraDY = try r.buffer(config.packed ? 8 : count*8, "Reference derivative y")
+        extraDX = try r.buffer(config.packed ? 8 : paddedCount*8, "Padded reference derivative x")
+        extraDY = try r.buffer(config.packed ? 8 : paddedCount*8, "Padded reference derivative y")
         plan = try FFTPlan(resources: r, buffer: omega, size: size)
-        realPlan = config.realFFT ? try FFTPlan(resources:r,buffer:rhs,size:size,real:true) : nil
+        paddedPlan = try FFTPlan(resources:r,buffer:velocity,size:paddedSize)
+        realPlan = config.realFFT ? try FFTPlan(resources:r,buffer:rhs,size:paddedSize,real:true) : nil
         snapshots = try SnapshotExchange(r, size: size)
         try reset()
     }
     func dispatch(_ name: String, _ e: MTLComputeCommandEncoder, _ p: inout GPUParams,
                   _ b0: MTLBuffer? = nil, _ b1: MTLBuffer? = nil, _ b2: MTLBuffer? = nil,
                   _ b3: MTLBuffer? = nil, _ b4: MTLBuffer? = nil, _ b5: MTLBuffer? = nil,
-                  threads: Int? = nil) {
+                  threads: Int? = nil, reductionGroups: Int? = nil) {
         e.setComputePipelineState(resources.kernels[name]!)
         e.setBuffer(b0, offset: 0, index: 0); e.setBuffer(b1, offset: 0, index: 1)
         e.setBuffer(b2, offset: 0, index: 2); e.setBuffer(b3, offset: 0, index: 3)
         e.setBuffer(b4, offset: 0, index: 4); e.setBuffer(b5, offset: 0, index: 5)
         e.setBytes(&p, length: MemoryLayout<GPUParams>.stride, index: 8)
-        var groups = UInt32(groupCount); e.setBytes(&groups, length: 4, index: 9)
+        var groups = UInt32(reductionGroups ?? groupCount); e.setBytes(&groups, length: 4, index: 9)
         let total = threads ?? count
         e.dispatchThreadgroups(MTLSize(width: (total+groupWidth-1)/groupWidth, height: 1, depth: 1), threadsPerThreadgroup: MTLSize(width: groupWidth, height: 1, depth: 1))
         e.memoryBarrier(scope: .buffers)
@@ -75,19 +80,19 @@ final class SpectralSolver {
             p.stage = UInt32(stage)
             encodeDerivatives(e, &p)
             try inverseDerivatives(cb, e)
-            dispatch("nonlinear", e, &p, velocity, gradient, rhs, maxima, extraDX, extraDY)
-            if stage == 0 { dispatch("chooseDT", e, &p, maxima, clock, threads: groupWidth) }
-            try (realPlan ?? plan).append(cb, e, rhs, inverse: false)
+            dispatch("nonlinear", e, &p, velocity, gradient, rhs, maxima, extraDX, extraDY, threads:paddedCount)
+            if stage == 0 { dispatch("chooseDT", e, &p, maxima, clock, threads:groupWidth,reductionGroups:paddedGroupCount) }
+            try (realPlan ?? paddedPlan).append(cb, e, rhs, inverse: false)
             dispatch("rkUpdate", e, &p, omega, base, rhs, coefficients, forcing, clock)
         }
         dispatch("advanceClock", e, &p, clock, threads: 1)
     }
     private func encodeDerivatives(_ e: MTLComputeCommandEncoder, _ p: inout GPUParams) {
-        dispatch(config.packed ? "derivePacked" : "deriveSeparate", e, &p, omega, coefficients, velocity, gradient, extraDX, extraDY)
+        dispatch(config.packed ? "derivePacked" : "deriveSeparate", e, &p, omega, coefficients, velocity, gradient, extraDX, extraDY, threads:paddedCount)
     }
     private func inverseDerivatives(_ cb: MTLCommandBuffer, _ e: MTLComputeCommandEncoder) throws {
-        try plan.append(cb, e, velocity, inverse: true); try plan.append(cb, e, gradient, inverse: true)
-        if !config.packed { try plan.append(cb, e, extraDX, inverse: true); try plan.append(cb, e, extraDY, inverse: true) }
+        try paddedPlan.append(cb, e, velocity, inverse: true); try paddedPlan.append(cb, e, gradient, inverse: true)
+        if !config.packed { try paddedPlan.append(cb, e, extraDX, inverse: true); try paddedPlan.append(cb, e, extraDY, inverse: true) }
     }
     func encodeDisplay(_ cb: MTLCommandBuffer, _ e: MTLComputeCommandEncoder, slot: DisplaySlot) throws {
         var p = GPUParams(config)
@@ -122,10 +127,10 @@ final class SpectralSolver {
             try phase("spectral") { _,e in self.encodeDerivatives(e,&p) }
             try phase("inverse FFTs") { cb,e in try self.inverseDerivatives(cb,e) }
             try phase("nonlinear + CFL") { _,e in
-                self.dispatch("nonlinear", e, &p, self.velocity, self.gradient, self.rhs, self.maxima, self.extraDX, self.extraDY)
-                if stage == 0 { self.dispatch("chooseDT", e, &p, self.maxima, self.clock, threads: self.groupWidth) }
+                self.dispatch("nonlinear", e, &p, self.velocity, self.gradient, self.rhs, self.maxima, self.extraDX, self.extraDY, threads:self.paddedCount)
+                if stage == 0 { self.dispatch("chooseDT", e, &p, self.maxima, self.clock, threads:self.groupWidth,reductionGroups:self.paddedGroupCount) }
             }
-            try phase("forward FFT") { cb,e in try (self.realPlan ?? self.plan).append(cb,e,self.rhs,inverse:false) }
+            try phase("forward FFT") { cb,e in try (self.realPlan ?? self.paddedPlan).append(cb,e,self.rhs,inverse:false) }
             try phase("RK update") { _,e in self.dispatch("rkUpdate", e, &p, self.omega, self.base, self.rhs, self.coefficients, self.forcing, self.clock) }
         }
         try phase("clock") { _,e in self.dispatch("advanceClock", e, &p, self.clock, threads:1) }
@@ -163,6 +168,6 @@ final class SpectralSolver {
         let cb = try command("Test inverse"), b = cb.makeBlitCommandEncoder()!
         b.copy(from:omega,sourceOffset:0,to:rhs,destinationOffset:0,size:count*8); b.endEncoding()
         let e = cb.makeComputeCommandEncoder()!; try plan.append(cb,e,rhs,inverse:true);e.endEncoding();try Self.finish(cb)
-        let data = try read(rhs); return stride(from:0,to:data.count,by:2).map { data[$0] }
+        let data = try read(rhs,floats:count*2); return stride(from:0,to:data.count,by:2).map { data[$0] }
     }
 }

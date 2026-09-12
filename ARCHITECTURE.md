@@ -4,7 +4,7 @@
 
 `ApplicationDelegate` explicitly owns the native AppKit window, toolbar and menu bar, with an `NSHostingController` hosting the SwiftUI interface. This ensures a fresh visible window on every launch without depending on scene restoration. `SimulationModel` owns the SwiftUI state. `SimulationEngine` confines solver configuration, VkFFT plan use, and command encoding to a serial worker queue. A completion-driven pump keeps at most two simulation command buffers outstanding. There is no busy polling or simulation work on the main thread.
 
-A normal batch uses **one serial compute encoder** for all RK stages, GPU CFL reduction, optional injection, and requested completed-state display conversion. The opaque C bridge appends VkFFT dispatches into that same encoder. Explicit buffer barriers separate custom operations and transforms. The Metal command queue preserves dependencies between batches. A C2C plan and an R2C plan, pipelines, buffers, and textures persist until the grid or preset is reset.
+A normal batch uses **one serial compute encoder** for all RK stages, GPU CFL reduction, optional injection, and requested completed-state display conversion. The opaque C bridge appends VkFFT dispatches into that same encoder. Explicit buffer barriers separate custom operations and transforms. The Metal command queue preserves dependencies between batches. Two C2C plans and an R2C plan, pipelines, buffers, and textures persist until the grid or preset is reset.
 
 `SnapshotExchange` protects three private RGBA32Float textures with a small CPU lock and reader/writer reservations. The GPU fills a reserved texture, then its completion handler publishes it. `MTKView` requests a fresh snapshot and acquires the latest completed one; a render completion handler releases it. Writers never touch the latest texture or a texture with readers. Rendering and simulation share one command queue, with at most two rendering submissions outstanding. MTKView targets 60 Hz; an idle-view 5 Hz heartbeat keeps diagnostics and fault detection alive. Large user-selected batches can increase display latency; they never block the main thread waiting for the solver.
 
@@ -12,7 +12,7 @@ An encoder or command buffer may still allocate small driver objects. There are 
 
 ## Equations and transforms
 
-The domain is `[0, 2π)²` and the grid is periodic. Wavenumbers are signed integers in FFT order. With forward transform `Σ f(x) exp(-i k·x)` and inverse transform `Σ f̂(k) exp(+i k·x) / N²`:
+The domain is `[0, 2π)²` and the grid is periodic. `N` is the spectral resolution per axis; `M = 3N/2` is the nonlinear evaluation resolution. Wavenumbers are signed integers in FFT order. With forward transform `Σ f(x) exp(-i k·x)` and inverse transform `Σ f̂(k) exp(+i k·x) / N²` on the state grid (or `/ M²` on the padded grid):
 
 ```
 ∂t ω = -u ∂xω - v ∂yω + ν∇²ω - αω + f
@@ -23,7 +23,9 @@ The domain is `[0, 2π)²` and the grid is periodic. Wavenumbers are signed inte
 
 VkFFT's `normalize = 1` normalizes inverse transforms only. The GPU state is Float32 complex `ω̂`. All zero-mode inverse coefficients are zero. Initial conditions, stage results, and injected vortices are projected onto zero-mean vorticity; a periodic streamfunction cannot represent nonzero mean vorticity.
 
-The retained rectangular mask is `3|kx| < N && 3|ky| < N`, with `(0,0)` removed. Derivative inputs are masked and the **transformed nonlinear product is projected in every RK update**, together with the updated state. The strict inequality guarantees `3K < N`, avoiding endpoint aliases of quadratic products. This is a Galerkin truncation with the 2/3 rule, not a radial filter. Initial physical fields are transformed and projected once.
+The state occupies N×N complex entries, retaining `|kx| < N/2 && |ky| < N/2`, with `(0,0)` removed. The even-grid Nyquist row and column stay zero to preserve an unambiguous real-field representation and avoid endpoint aliases. Initial fields, RK states and injected vortices follow this convention. There is no 2/3 cutoff on the N-grid state.
+
+For each nonlinear evaluation, a gather kernel embeds the signed N-grid modes into M×M workspaces and clears all other entries. It scales the input coefficients by `M²/N² = 9/4`, compensating for the padded inverse FFT normalization. After multiplication and the forward FFT, the RK kernel crops the signed modes back to N×N and scales by `N²/M² = 4/9`. With maximum retained component `K = N/2−1`, `3K < M` prevents quadratic products from aliasing into retained modes. This is the [3/2 padding rule](https://kth-nek5000.github.io/kthNekBook/_md/spectral/pseudo.html); the CPU tests verify it against direct, non-wrapping Galerkin convolution rather than another padded implementation.
 
 ## Three transforms per nonlinear evaluation
 
@@ -36,9 +38,9 @@ IFFT(Â) = u + i v
 IFFT(B̂) = ∂xω + i ∂yω
 ```
 
-The physical kernel computes the real product `-(u*∂xω + v*∂yω)` into rows of `N+2` Floats. The final two values in each row are padding. A reusable in-place **R2C** forward plan produces `N × (N/2+1)` complex coefficients. The RK kernel reads positive-x modes directly and reconstructs a negative-x coefficient as the conjugate of `(N-kx, (N-ky)%N)` in that half-spectrum. No unpacking pass or full-spectrum nonlinear temporary is needed.
+The physical kernel computes the real product `-(u*∂xω + v*∂yω)` over M×M points into rows of `M+2` Floats. The final two values are in-place FFT storage padding, separate from spectral zero padding. A reusable **R2C** forward plan produces `M × (M/2+1)` complex coefficients. The RK kernel maps each retained signed N-grid mode to that half-spectrum, reconstructing negative-x modes by Hermitian symmetry, and applies the crop normalization. No separate crop/unpack pass or extra N-grid nonlinear buffer is needed.
 
-Each stage therefore needs **two C2C inverse transforms and one R2C forward transform**: six complex inverses and three real forwards per RK3 timestep. A full-complex forward comparison is available via `--c2c`, and `--unpacked` restores four separate inverse transforms. Main-state precision is never reduced. R2C was retained after small-grid CPU-reference tests, cross-checks at every supported grid, and measured end-to-end improvement. Converting the packed inverse fields to four separate C2R transforms remains an unmeasured alternative with different storage and scheduling costs.
+Each stage therefore needs **two C2C inverse transforms and one R2C forward transform**, all M×M: six complex inverses and three real forwards per RK3 timestep. Three plans are reused: N-grid C2C for initialization/display, M-grid C2C for derivatives, and M-grid R2C for products. A full-complex forward comparison is available via `--c2c`, and `--unpacked` restores four separate M-grid inverse transforms. Main-state precision is never reduced. Both forward paths and packed/unpacked evaluation are checked against the independent CPU reference. Earlier R2C performance comparisons used the former 2/3-truncated solver; converting the packed inverse fields to four C2R transforms remains an unmeasured alternative.
 
 SSP-RK3 stores only the original state and the current stage:
 
@@ -52,11 +54,11 @@ The first RK write also stores `w0`, avoiding a separate full-field copy. Linear
 
 ```
 dt <= user ceiling
-dt <= 1.5 / (2 ν K² + α), K = floor((N-1)/3)
-auto CFL only: dt <= CFL * (2π/N) / max(|u|+|v|)
+dt <= 1.5 / (2 ν K² + α), K = N/2−1
+auto CFL only: dt <= CFL * (2π/M) / max(|u|+|v|)
 ```
 
-The diffusion bound is conservative for SSP-RK3's negative-real stability interval. Fixed dt still obeys this bound. The automatic CFL value is fresh every step; it never relies on delayed CPU diagnostics. The GPU clock uses compensated summation to avoid drift from repeatedly adding small Float32 timesteps. Non-finite reduction values set a GPU fault flag and halt advancement; the UI pauses on the next diagnostic completion. Fixed dt can still violate the advective limit, so automatic CFL is the default, with a 0.02 ceiling and CFL 0.45.
+The diffusion bound uses the full retained spectral band and is conservative for SSP-RK3's negative-real stability interval. Fixed dt still obeys this bound. The automatic CFL reduction covers all M² nonlinear points and uses the padded spacing; it is fresh every step and never relies on delayed CPU diagnostics. The GPU clock uses compensated summation to avoid drift from repeatedly adding small Float32 timesteps. Non-finite reduction values set a GPU fault flag and halt advancement; the UI pauses on the next diagnostic completion. Fixed dt can still violate the advective limit, so automatic CFL is the default, with a 0.02 ceiling and CFL 0.80. The inspector spans 0.10–0.82. [The CFL study](Benchmarks/CFL_STUDY.md) records the tested stability brackets, timestep-reference comparisons, and throughput; larger experimental values can be supplied to the CLI. Finite output alone does not establish accuracy or nonlinear stability.
 
 ## Presets and forcing
 
@@ -69,23 +71,23 @@ The forcing template is computed once from the seed. It is evaluated at the RK s
 
 ## Buffer lifetime and memory
 
-Approximate application allocations, excluding driver/VkFFT private scratch:
+Approximate application allocations per N-grid cell, excluding driver/VkFFT private scratch (M² = 2.25 N²):
 
 | Allocation | Bytes/cell | Lifetime / reuse |
 |---|---:|---|
 | `omega` | 8 | Current spectral state, all stages |
 | `base` | 8 | Original state, one RK timestep |
-| `velocity` | 8 | Packed velocity; later display omega + i psi |
-| `gradient` | 8 | Packed gradients; later display u + i v |
-| `rhs` | 8 | Padded real nonlinear product / half spectrum; full capacity retained for C2C tests |
+| `velocity` | 18 | M-grid packed velocity; N-grid prefix reused for display omega + i psi |
+| `gradient` | 18 | M-grid packed gradients; N-grid prefix reused for display u + i v |
+| `rhs` | 18 | M-grid nonlinear product / half spectrum; full C2C capacity retained |
 | coefficients | 16 | kx, ky, inverse k², mask; immutable |
 | forcing | 8 | Immutable seeded Hermitian band |
 | three display textures | 48 | Completed snapshots for rendering |
-| reduction partials | ~0.08 | Reused each timestep/display conversion |
+| reduction partials | ~0.10 | M-grid CFL and N-grid physical diagnostics |
 
-Total: approximately **112 MiB at 1024²**, 28 MiB at 512², and 448 MiB at 2048², plus VkFFT plan/LUT/scratch allocations. All these allocations use private GPU storage. Only three 32-byte diagnostic records use shared storage. The GPU clock also uses private storage. The conventional FFT comparison adds two 8-byte/cell derivative buffers; the packed path allocates only trivial dummy bindings for those slots.
+Total: approximately **142 MiB at N = 1024**, 35.5 MiB at N = 512, and 568 MiB at N = 2048, plus VkFFT plan/LUT/scratch allocations. All these allocations use private GPU storage. Only three 32-byte diagnostic records use shared storage. The GPU clock also uses private storage. The conventional FFT comparison adds two M-grid complex derivative buffers (36 bytes per N-grid cell); the packed path allocates only trivial dummy bindings for those slots.
 
-Display generation performs two inverse transforms: `(ω,ψ)` and `(u,v)`, reusing the derivative workspaces after the last RK stage. A fused conversion/reduction writes `(ω,|u|,ψ,ω²/2)` into the snapshot. A final small reduction emits mean kinetic energy, mean enstrophy, max vorticity, max velocity, time, dt, step count, and fault status. These are spatial means; multiply energies by domain area `4π²` to obtain integrals. Swift receives only the 32-byte record. Full-state downloads exist only in test helpers. PNG readback is an explicit command-line export.
+Display generation performs two N×N inverse transforms: `(ω,ψ)` and `(u,v)`, reusing the prefixes of the larger derivative workspaces after the last RK stage. A fused conversion/reduction writes `(ω,|u|,ψ,ω²/2)` into the N×N snapshot. A final small reduction emits mean kinetic energy, mean enstrophy, max vorticity, max velocity, time, dt, step count, and fault status. These diagnostics are sampled on the N-grid; the CFL bound uses M-grid velocities. Energy/enstrophy are spatial means; multiply by domain area `4π²` to obtain integrals. Swift receives only the 32-byte record. Full-state downloads exist only in test helpers. PNG readback is an explicit command-line export.
 
 ## Instrumentation and limits
 

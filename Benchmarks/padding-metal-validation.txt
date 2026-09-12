@@ -1,0 +1,92 @@
+2026-09-12 23:39:18.993 TurbulenceLab[63401:5087493] Metal API Validation Enabled
+2026-09-12 23:39:18.993 TurbulenceLab[63401:5087493] Metal GPU Validation Enabled
+NUMERICAL SUITE: 3/2 padding, forward C2C
+PASS complex FFT forward/inverse max error 7.1525574e-07
+PASS N spectral nodes and 3N/2 transform nodes 
+PASS 3N/2 mixed-radix FFT forward/inverse max error 1.4305115e-06
+PASS spectral derivative max error 5.2452087e-06
+PASS Laplacian max error 8.106232e-05
+PASS Poisson inversion max error 7.0780516e-08
+PASS velocity u sign max error 1.3411045e-07
+PASS velocity v sign max error 2.0861626e-07
+PASS zero divergence max error 2.26008e-14
+PASS full spectral band with zero Nyquist lines 
+PASS safe zero mode inverse 
+PASS zero mean projection 
+PASS modes above the old 2/3 cutoff retained 
+PASS padded signed-mode placement and inverse normalization max error 9.86025e-05
+PASS Nyquist rows and columns removed 
+PASS deterministic seed 
+PASS distinct seeds 
+PASS inviscid energy conservation relative drift -6.020069e-06
+PASS inviscid enstrophy conservation 
+PASS viscous kinetic energy decay 
+PASS 700 steps remain finite 
+PASS compensated simulated clock 
+PASS SSP-RK3 convergence error ratio 8.4038925, fine 1.22487545e-05
+PASS Parseval physical energy 
+PASS physical enstrophy 
+PASS 3 vs 5 transforms per stage max error 4.7683716e-07
+PASS GPU vs independent Double convolution/RK3 max error 5.9604645e-07
+PASS R2C RHS vs Double convolution/RK3 max error 5.9604645e-07
+PASS high-mode quadratic products agree with alias-free convolution max error 8.34465e-07
+PASS cropped RHS preserves Hermitian symmetry and Nyquist convention Hermitian error 1.6778358e-08
+PASS preset Decaying turbulence 
+PASS preset Vortex gas 
+PASS preset Kelvin–Helmholtz 
+PASS preset Forced inverse cascade 
+PASS GPU CFL uses the entire padded grid and spacing dt 0.00051852345, expected 0.0005185234
+PASS diffusion limit uses the full spectral band 
+PASS GPU vortex injection sign 
+PASS GPU vortex injection zero mean 
+PASS non-finite fault detection 
+PASS forcing Hermitian symmetry and band 
+PASS forcing drives a resting flow 
+ALL 41 NUMERICAL CHECKS PASSED on Apple M1 Max
+NUMERICAL SUITE: 3/2 padding, forward R2C
+PASS complex FFT forward/inverse max error 7.1525574e-07
+PASS N spectral nodes and 3N/2 transform nodes 
+PASS 3N/2 mixed-radix FFT forward/inverse max error 1.4305115e-06
+PASS spectral derivative max error 5.2452087e-06
+PASS Laplacian max error 8.106232e-05
+PASS Poisson inversion max error 7.0780516e-08
+PASS velocity u sign max error 1.3411045e-07
+PASS velocity v sign max error 2.0861626e-07
+PASS zero divergence max error 2.26008e-14
+PASS full spectral band with zero Nyquist lines 
+PASS safe zero mode inverse 
+PASS zero mean projection 
+PASS modes above the old 2/3 cutoff retained 
+PASS padded signed-mode placement and inverse normalization max error 9.86025e-05
+PASS Nyquist rows and columns removed 
+PASS deterministic seed 
+PASS distinct seeds 
+PASS inviscid energy conservation relative drift -6.020069e-06
+PASS inviscid enstrophy conservation 
+PASS viscous kinetic energy decay 
+PASS 700 steps remain finite 
+PASS compensated simulated clock 
+PASS SSP-RK3 convergence error ratio 8.4038925, fine 1.22487545e-05
+PASS Parseval physical energy 
+PASS physical enstrophy 
+PASS 3 vs 5 transforms per stage max error 4.7683716e-07
+PASS GPU vs independent Double convolution/RK3 max error 5.9604645e-07
+PASS R2C RHS vs Double convolution/RK3 max error 5.9604645e-07
+PASS high-mode quadratic products agree with alias-free convolution max error 8.34465e-07
+PASS cropped RHS preserves Hermitian symmetry and Nyquist convention Hermitian error 5.456968e-12
+PASS preset Decaying turbulence 
+PASS preset Vortex gas 
+PASS preset Kelvin–Helmholtz 
+PASS preset Forced inverse cascade 
+PASS GPU CFL uses the entire padded grid and spacing dt 0.00051852345, expected 0.0005185234
+PASS diffusion limit uses the full spectral band 
+PASS GPU vortex injection sign 
+PASS GPU vortex injection zero mean 
+PASS non-finite fault detection 
+PASS forcing Hermitian symmetry and band 
+PASS forcing drives a resting flow 
+PASS R2C vs C2C at 256² max error 1.9073486e-06
+PASS R2C vs C2C at 512² max error 9.536743e-07
+PASS R2C vs C2C at 1024² max error 1.4305115e-06
+PASS R2C vs C2C at 2048² max error 1.9073486e-06
+ALL 45 NUMERICAL CHECKS PASSED on Apple M1 Max
