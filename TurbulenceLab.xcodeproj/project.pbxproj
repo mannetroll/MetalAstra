@@ -1,66 +1,463 @@
 // !$*UTF8*$!
-{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
-000000000000000000000065 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/App/ContentView.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000066 = { isa = PBXBuildFile; fileRef = 000000000000000000000065; };
-000000000000000000000067 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/App/TurbulenceLabApp.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000068 = { isa = PBXBuildFile; fileRef = 000000000000000000000067; };
-000000000000000000000069 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Metal/MetalResources.swift"; sourceTree = SOURCE_ROOT; };
-00000000000000000000006A = { isa = PBXBuildFile; fileRef = 000000000000000000000069; };
-00000000000000000000006B = { isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = "TurbulenceLab/Metal/TurbulenceKernels.metal"; sourceTree = SOURCE_ROOT; };
-00000000000000000000006C = { isa = PBXBuildFile; fileRef = 00000000000000000000006B; };
-00000000000000000000006D = { isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = "TurbulenceLab/Metal/Visualization.metal"; sourceTree = SOURCE_ROOT; };
-00000000000000000000006E = { isa = PBXBuildFile; fileRef = 00000000000000000000006D; };
-00000000000000000000006F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Simulation/SimulationConfig.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000070 = { isa = PBXBuildFile; fileRef = 00000000000000000000006F; };
-000000000000000000000071 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Simulation/SimulationEngine.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000072 = { isa = PBXBuildFile; fileRef = 000000000000000000000071; };
-000000000000000000000073 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Simulation/SpectralSolver.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000074 = { isa = PBXBuildFile; fileRef = 000000000000000000000073; };
-000000000000000000000075 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Tests/CommandLineRunner.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000076 = { isa = PBXBuildFile; fileRef = 000000000000000000000075; };
-000000000000000000000077 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Tests/NumericalTests.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000078 = { isa = PBXBuildFile; fileRef = 000000000000000000000077; };
-000000000000000000000079 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Tests/RenderExport.swift"; sourceTree = SOURCE_ROOT; };
-00000000000000000000007A = { isa = PBXBuildFile; fileRef = 000000000000000000000079; };
-00000000000000000000007B = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/Tests/UIAutomation.swift"; sourceTree = SOURCE_ROOT; };
-00000000000000000000007C = { isa = PBXBuildFile; fileRef = 00000000000000000000007B; };
-00000000000000000000007D = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/UI/ControlsView.swift"; sourceTree = SOURCE_ROOT; };
-00000000000000000000007E = { isa = PBXBuildFile; fileRef = 00000000000000000000007D; };
-00000000000000000000007F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/UI/DiagnosticsView.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000080 = { isa = PBXBuildFile; fileRef = 00000000000000000000007F; };
-000000000000000000000081 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TurbulenceLab/UI/SimulationView.swift"; sourceTree = SOURCE_ROOT; };
-000000000000000000000082 = { isa = PBXBuildFile; fileRef = 000000000000000000000081; };
-000000000000000000000083 = { isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "TurbulenceLab/VkFFTBridge/VkFFTBridge.mm"; sourceTree = SOURCE_ROOT; };
-000000000000000000000084 = { isa = PBXBuildFile; fileRef = 000000000000000000000083; };
-000000000000000000000085 = { isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TurbulenceLab/VkFFTBridge/VkFFTBridge.h"; sourceTree = SOURCE_ROOT; };
-000000000000000000000086 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = TurbulenceLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
-000000000000000000000088 = { isa = PBXGroup; children = (000000000000000000000065,000000000000000000000067,000000000000000000000069,00000000000000000000006B,00000000000000000000006D,00000000000000000000006F,000000000000000000000071,000000000000000000000073,000000000000000000000075,000000000000000000000077,000000000000000000000079,00000000000000000000007B,00000000000000000000007D,00000000000000000000007F,000000000000000000000081,000000000000000000000083,000000000000000000000085,000000000000000000000087); sourceTree = "<group>"; };
-000000000000000000000087 = { isa = PBXGroup; children = (000000000000000000000086,000000000000000000000089); name = Products; sourceTree = "<group>"; };
-00000000000000000000008A = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (000000000000000000000066,000000000000000000000068,00000000000000000000006A,00000000000000000000006C,00000000000000000000006E,000000000000000000000070,000000000000000000000072,000000000000000000000074,000000000000000000000076,000000000000000000000078,00000000000000000000007A,00000000000000000000007C,00000000000000000000007E,000000000000000000000080,000000000000000000000082,000000000000000000000084); runOnlyForDeploymentPostprocessing = 0; };
-00000000000000000000008B = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-00000000000000000000008C = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-00000000000000000000008D = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_NAME = "TurbulenceLab"; PRODUCT_BUNDLE_IDENTIFIER = "org.metalastra.TurbulenceLab"; MACOSX_DEPLOYMENT_TARGET = "15.0"; SDKROOT = "macosx"; ARCHS = "arm64"; SWIFT_VERSION = "5.0"; CLANG_CXX_LANGUAGE_STANDARD = "c++17"; CLANG_ENABLE_MODULES = "YES"; CLANG_ENABLE_OBJC_ARC = "YES"; ENABLE_HARDENED_RUNTIME = "YES"; CODE_SIGN_STYLE = "Automatic"; GENERATE_INFOPLIST_FILE = "YES"; INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education"; INFOPLIST_KEY_NSPrincipalClass = "NSApplication"; INFOPLIST_KEY_NSHighResolutionCapable = "YES"; MARKETING_VERSION = "1.0"; CURRENT_PROJECT_VERSION = "1"; SWIFT_OBJC_BRIDGING_HEADER = "TurbulenceLab/VkFFTBridge/VkFFTBridge.h"; HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor $(SRCROOT)/Vendor/VkFFT"; OTHER_LDFLAGS = "-framework Metal -framework MetalKit -framework QuartzCore -framework Foundation"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; GCC_OPTIMIZATION_LEVEL = "0"; MTL_FAST_MATH = "NO"; ENABLE_TESTABILITY = "YES"; DEBUG_INFORMATION_FORMAT = "dwarf"; SWIFT_COMPILATION_MODE = "singlefile"; }; name = Debug; };
-00000000000000000000008E = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_NAME = "TurbulenceLabTests"; PRODUCT_BUNDLE_IDENTIFIER = "org.metalastra.TurbulenceLabTests"; MACOSX_DEPLOYMENT_TARGET = "15.0"; SDKROOT = "macosx"; ARCHS = "arm64"; SWIFT_VERSION = "5.0"; CLANG_CXX_LANGUAGE_STANDARD = "c++17"; CLANG_ENABLE_MODULES = "YES"; CLANG_ENABLE_OBJC_ARC = "YES"; ENABLE_HARDENED_RUNTIME = "YES"; CODE_SIGN_STYLE = "Automatic"; GENERATE_INFOPLIST_FILE = "YES"; INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education"; INFOPLIST_KEY_NSPrincipalClass = "NSApplication"; INFOPLIST_KEY_NSHighResolutionCapable = "YES"; MARKETING_VERSION = "1.0"; CURRENT_PROJECT_VERSION = "1"; SWIFT_OBJC_BRIDGING_HEADER = "TurbulenceLab/VkFFTBridge/VkFFTBridge.h"; HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor $(SRCROOT)/Vendor/VkFFT"; OTHER_LDFLAGS = "-framework Metal -framework MetalKit -framework QuartzCore -framework Foundation"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; GCC_OPTIMIZATION_LEVEL = "0"; MTL_FAST_MATH = "NO"; ENABLE_TESTABILITY = "YES"; DEBUG_INFORMATION_FORMAT = "dwarf"; SWIFT_COMPILATION_MODE = "singlefile"; CODE_SIGNING_ALLOWED = "NO"; }; name = Debug; };
-00000000000000000000008F = { isa = XCBuildConfiguration; buildSettings = {}; name = Debug; };
-000000000000000000000090 = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_NAME = "TurbulenceLab"; PRODUCT_BUNDLE_IDENTIFIER = "org.metalastra.TurbulenceLab"; MACOSX_DEPLOYMENT_TARGET = "15.0"; SDKROOT = "macosx"; ARCHS = "arm64"; SWIFT_VERSION = "5.0"; CLANG_CXX_LANGUAGE_STANDARD = "c++17"; CLANG_ENABLE_MODULES = "YES"; CLANG_ENABLE_OBJC_ARC = "YES"; ENABLE_HARDENED_RUNTIME = "YES"; CODE_SIGN_STYLE = "Automatic"; GENERATE_INFOPLIST_FILE = "YES"; INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education"; INFOPLIST_KEY_NSPrincipalClass = "NSApplication"; INFOPLIST_KEY_NSHighResolutionCapable = "YES"; MARKETING_VERSION = "1.0"; CURRENT_PROJECT_VERSION = "1"; SWIFT_OBJC_BRIDGING_HEADER = "TurbulenceLab/VkFFTBridge/VkFFTBridge.h"; HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor $(SRCROOT)/Vendor/VkFFT"; OTHER_LDFLAGS = "-framework Metal -framework MetalKit -framework QuartzCore -framework Foundation"; SWIFT_OPTIMIZATION_LEVEL = "-O"; GCC_OPTIMIZATION_LEVEL = "3"; MTL_FAST_MATH = "NO"; ENABLE_TESTABILITY = "YES"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; SWIFT_COMPILATION_MODE = "wholemodule"; }; name = Release; };
-000000000000000000000091 = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_NAME = "TurbulenceLabTests"; PRODUCT_BUNDLE_IDENTIFIER = "org.metalastra.TurbulenceLabTests"; MACOSX_DEPLOYMENT_TARGET = "15.0"; SDKROOT = "macosx"; ARCHS = "arm64"; SWIFT_VERSION = "5.0"; CLANG_CXX_LANGUAGE_STANDARD = "c++17"; CLANG_ENABLE_MODULES = "YES"; CLANG_ENABLE_OBJC_ARC = "YES"; ENABLE_HARDENED_RUNTIME = "YES"; CODE_SIGN_STYLE = "Automatic"; GENERATE_INFOPLIST_FILE = "YES"; INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education"; INFOPLIST_KEY_NSPrincipalClass = "NSApplication"; INFOPLIST_KEY_NSHighResolutionCapable = "YES"; MARKETING_VERSION = "1.0"; CURRENT_PROJECT_VERSION = "1"; SWIFT_OBJC_BRIDGING_HEADER = "TurbulenceLab/VkFFTBridge/VkFFTBridge.h"; HEADER_SEARCH_PATHS = "$(SRCROOT)/Vendor $(SRCROOT)/Vendor/VkFFT"; OTHER_LDFLAGS = "-framework Metal -framework MetalKit -framework QuartzCore -framework Foundation"; SWIFT_OPTIMIZATION_LEVEL = "-O"; GCC_OPTIMIZATION_LEVEL = "3"; MTL_FAST_MATH = "NO"; ENABLE_TESTABILITY = "YES"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; SWIFT_COMPILATION_MODE = "wholemodule"; CODE_SIGNING_ALLOWED = "NO"; }; name = Release; };
-000000000000000000000092 = { isa = XCBuildConfiguration; buildSettings = {}; name = Release; };
-000000000000000000000093 = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000008D,000000000000000000000090); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-000000000000000000000094 = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000008F,000000000000000000000092); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-000000000000000000000095 = { isa = PBXNativeTarget; buildConfigurationList = 000000000000000000000093; buildPhases = (00000000000000000000008A,00000000000000000000008B,00000000000000000000008C); buildRules = (); dependencies = (); name = TurbulenceLab; productName = TurbulenceLab; productReference = 000000000000000000000086; productType = "com.apple.product-type.application"; };
-000000000000000000000096 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTest/SolverTests.swift; sourceTree = SOURCE_ROOT; };
-000000000000000000000097 = { isa = PBXBuildFile; fileRef = 000000000000000000000096; };
-000000000000000000000098 = { isa = PBXBuildFile; fileRef = 000000000000000000000069; };
-000000000000000000000099 = { isa = PBXBuildFile; fileRef = 00000000000000000000006B; };
-00000000000000000000009A = { isa = PBXBuildFile; fileRef = 00000000000000000000006D; };
-00000000000000000000009B = { isa = PBXBuildFile; fileRef = 00000000000000000000006F; };
-00000000000000000000009C = { isa = PBXBuildFile; fileRef = 000000000000000000000073; };
-00000000000000000000009D = { isa = PBXBuildFile; fileRef = 000000000000000000000077; };
-00000000000000000000009E = { isa = PBXBuildFile; fileRef = 000000000000000000000083; };
-00000000000000000000009F = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (000000000000000000000098,000000000000000000000099,00000000000000000000009A,00000000000000000000009B,00000000000000000000009C,00000000000000000000009D,00000000000000000000009E,000000000000000000000097); runOnlyForDeploymentPostprocessing = 0; };
-0000000000000000000000A0 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-0000000000000000000000A1 = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000008E,000000000000000000000091); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-000000000000000000000089 = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = TurbulenceLabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-0000000000000000000000A2 = { isa = PBXNativeTarget; buildConfigurationList = 0000000000000000000000A1; buildPhases = (00000000000000000000009F,0000000000000000000000A0); buildRules = (); dependencies = (); name = TurbulenceLabTests; productName = TurbulenceLabTests; productReference = 000000000000000000000089; productType = "com.apple.product-type.bundle.unit-test"; };
-0000000000000000000000A3 = { isa = PBXProject; attributes = { LastUpgradeCheck = 2630; }; buildConfigurationList = 000000000000000000000094; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; knownRegions = (en,Base); mainGroup = 000000000000000000000088; productRefGroup = 000000000000000000000087; projectDirPath = ""; projectRoot = ""; targets = (000000000000000000000095,0000000000000000000000A2); };
-}; rootObject = 0000000000000000000000A3; }
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000000066 /* TurbulenceLab/App/ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000065 /* TurbulenceLab/App/ContentView.swift */; };
+		000000000000000000000068 /* TurbulenceLab/App/TurbulenceLabApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000067 /* TurbulenceLab/App/TurbulenceLabApp.swift */; };
+		00000000000000000000006A /* TurbulenceLab/Metal/MetalResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000069 /* TurbulenceLab/Metal/MetalResources.swift */; };
+		00000000000000000000006C /* TurbulenceLab/Metal/TurbulenceKernels.metal in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006B /* TurbulenceLab/Metal/TurbulenceKernels.metal */; };
+		00000000000000000000006E /* TurbulenceLab/Metal/Visualization.metal in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006D /* TurbulenceLab/Metal/Visualization.metal */; };
+		000000000000000000000070 /* TurbulenceLab/Simulation/SimulationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006F /* TurbulenceLab/Simulation/SimulationConfig.swift */; };
+		000000000000000000000072 /* TurbulenceLab/Simulation/SimulationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000071 /* TurbulenceLab/Simulation/SimulationEngine.swift */; };
+		000000000000000000000074 /* TurbulenceLab/Simulation/SpectralSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000073 /* TurbulenceLab/Simulation/SpectralSolver.swift */; };
+		000000000000000000000076 /* TurbulenceLab/Tests/CommandLineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000075 /* TurbulenceLab/Tests/CommandLineRunner.swift */; };
+		000000000000000000000078 /* TurbulenceLab/Tests/NumericalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000077 /* TurbulenceLab/Tests/NumericalTests.swift */; };
+		00000000000000000000007A /* TurbulenceLab/Tests/RenderExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000079 /* TurbulenceLab/Tests/RenderExport.swift */; };
+		00000000000000000000007C /* TurbulenceLab/Tests/UIAutomation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000007B /* TurbulenceLab/Tests/UIAutomation.swift */; };
+		00000000000000000000007E /* TurbulenceLab/UI/ControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000007D /* TurbulenceLab/UI/ControlsView.swift */; };
+		000000000000000000000080 /* TurbulenceLab/UI/DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000007F /* TurbulenceLab/UI/DiagnosticsView.swift */; };
+		000000000000000000000082 /* TurbulenceLab/UI/SimulationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000081 /* TurbulenceLab/UI/SimulationView.swift */; };
+		000000000000000000000084 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000083 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm */; };
+		000000000000000000000097 /* XCTest/SolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000096 /* XCTest/SolverTests.swift */; };
+		000000000000000000000098 /* TurbulenceLab/Metal/MetalResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000069 /* TurbulenceLab/Metal/MetalResources.swift */; };
+		000000000000000000000099 /* TurbulenceLab/Metal/TurbulenceKernels.metal in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006B /* TurbulenceLab/Metal/TurbulenceKernels.metal */; };
+		00000000000000000000009A /* TurbulenceLab/Metal/Visualization.metal in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006D /* TurbulenceLab/Metal/Visualization.metal */; };
+		00000000000000000000009B /* TurbulenceLab/Simulation/SimulationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006F /* TurbulenceLab/Simulation/SimulationConfig.swift */; };
+		00000000000000000000009C /* TurbulenceLab/Simulation/SpectralSolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000073 /* TurbulenceLab/Simulation/SpectralSolver.swift */; };
+		00000000000000000000009D /* TurbulenceLab/Tests/NumericalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000077 /* TurbulenceLab/Tests/NumericalTests.swift */; };
+		00000000000000000000009E /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000083 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000000000000000000000065 /* TurbulenceLab/App/ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/App/ContentView.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000067 /* TurbulenceLab/App/TurbulenceLabApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/App/TurbulenceLabApp.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000069 /* TurbulenceLab/Metal/MetalResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Metal/MetalResources.swift; sourceTree = SOURCE_ROOT; };
+		00000000000000000000006B /* TurbulenceLab/Metal/TurbulenceKernels.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TurbulenceLab/Metal/TurbulenceKernels.metal; sourceTree = SOURCE_ROOT; };
+		00000000000000000000006D /* TurbulenceLab/Metal/Visualization.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TurbulenceLab/Metal/Visualization.metal; sourceTree = SOURCE_ROOT; };
+		00000000000000000000006F /* TurbulenceLab/Simulation/SimulationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Simulation/SimulationConfig.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000071 /* TurbulenceLab/Simulation/SimulationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Simulation/SimulationEngine.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000073 /* TurbulenceLab/Simulation/SpectralSolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Simulation/SpectralSolver.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000075 /* TurbulenceLab/Tests/CommandLineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Tests/CommandLineRunner.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000077 /* TurbulenceLab/Tests/NumericalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Tests/NumericalTests.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000079 /* TurbulenceLab/Tests/RenderExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Tests/RenderExport.swift; sourceTree = SOURCE_ROOT; };
+		00000000000000000000007B /* TurbulenceLab/Tests/UIAutomation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/Tests/UIAutomation.swift; sourceTree = SOURCE_ROOT; };
+		00000000000000000000007D /* TurbulenceLab/UI/ControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/UI/ControlsView.swift; sourceTree = SOURCE_ROOT; };
+		00000000000000000000007F /* TurbulenceLab/UI/DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/UI/DiagnosticsView.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000081 /* TurbulenceLab/UI/SimulationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceLab/UI/SimulationView.swift; sourceTree = SOURCE_ROOT; };
+		000000000000000000000083 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TurbulenceLab/VkFFTBridge/VkFFTBridge.mm; sourceTree = SOURCE_ROOT; };
+		000000000000000000000085 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TurbulenceLab/VkFFTBridge/VkFFTBridge.h; sourceTree = SOURCE_ROOT; };
+		000000000000000000000086 /* TurbulenceLab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = TurbulenceLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000089 /* TurbulenceLabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = TurbulenceLabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000096 /* XCTest/SolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTest/SolverTests.swift; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		00000000000000000000008B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0000000000000000000000A0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000000087 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000086 /* TurbulenceLab.app */,
+				000000000000000000000089 /* TurbulenceLabTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		000000000000000000000088 = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000065 /* TurbulenceLab/App/ContentView.swift */,
+				000000000000000000000067 /* TurbulenceLab/App/TurbulenceLabApp.swift */,
+				000000000000000000000069 /* TurbulenceLab/Metal/MetalResources.swift */,
+				00000000000000000000006B /* TurbulenceLab/Metal/TurbulenceKernels.metal */,
+				00000000000000000000006D /* TurbulenceLab/Metal/Visualization.metal */,
+				00000000000000000000006F /* TurbulenceLab/Simulation/SimulationConfig.swift */,
+				000000000000000000000071 /* TurbulenceLab/Simulation/SimulationEngine.swift */,
+				000000000000000000000073 /* TurbulenceLab/Simulation/SpectralSolver.swift */,
+				000000000000000000000075 /* TurbulenceLab/Tests/CommandLineRunner.swift */,
+				000000000000000000000077 /* TurbulenceLab/Tests/NumericalTests.swift */,
+				000000000000000000000079 /* TurbulenceLab/Tests/RenderExport.swift */,
+				00000000000000000000007B /* TurbulenceLab/Tests/UIAutomation.swift */,
+				00000000000000000000007D /* TurbulenceLab/UI/ControlsView.swift */,
+				00000000000000000000007F /* TurbulenceLab/UI/DiagnosticsView.swift */,
+				000000000000000000000081 /* TurbulenceLab/UI/SimulationView.swift */,
+				000000000000000000000083 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm */,
+				000000000000000000000085 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.h */,
+				000000000000000000000087 /* Products */,
+				79C8CD993055F0B2004FA67C /* Recovered References */,
+			);
+			sourceTree = "<group>";
+		};
+		79C8CD993055F0B2004FA67C /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000096 /* XCTest/SolverTests.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000000095 /* TurbulenceLab */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000093 /* Build configuration list for PBXNativeTarget "TurbulenceLab" */;
+			buildPhases = (
+				00000000000000000000008A /* Sources */,
+				00000000000000000000008B /* Frameworks */,
+				00000000000000000000008C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TurbulenceLab;
+			productName = TurbulenceLab;
+			productReference = 000000000000000000000086 /* TurbulenceLab.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0000000000000000000000A2 /* TurbulenceLabTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0000000000000000000000A1 /* Build configuration list for PBXNativeTarget "TurbulenceLabTests" */;
+			buildPhases = (
+				00000000000000000000009F /* Sources */,
+				0000000000000000000000A0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TurbulenceLabTests;
+			productName = TurbulenceLabTests;
+			productReference = 000000000000000000000089 /* TurbulenceLabTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0000000000000000000000A3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 2630;
+			};
+			buildConfigurationList = 000000000000000000000094 /* Build configuration list for PBXProject "TurbulenceLab" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 000000000000000000000088;
+			productRefGroup = 000000000000000000000087 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000000095 /* TurbulenceLab */,
+				0000000000000000000000A2 /* TurbulenceLabTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		00000000000000000000008C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		00000000000000000000008A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000066 /* TurbulenceLab/App/ContentView.swift in Sources */,
+				000000000000000000000068 /* TurbulenceLab/App/TurbulenceLabApp.swift in Sources */,
+				00000000000000000000006A /* TurbulenceLab/Metal/MetalResources.swift in Sources */,
+				00000000000000000000006C /* TurbulenceLab/Metal/TurbulenceKernels.metal in Sources */,
+				00000000000000000000006E /* TurbulenceLab/Metal/Visualization.metal in Sources */,
+				000000000000000000000070 /* TurbulenceLab/Simulation/SimulationConfig.swift in Sources */,
+				000000000000000000000072 /* TurbulenceLab/Simulation/SimulationEngine.swift in Sources */,
+				000000000000000000000074 /* TurbulenceLab/Simulation/SpectralSolver.swift in Sources */,
+				000000000000000000000076 /* TurbulenceLab/Tests/CommandLineRunner.swift in Sources */,
+				000000000000000000000078 /* TurbulenceLab/Tests/NumericalTests.swift in Sources */,
+				00000000000000000000007A /* TurbulenceLab/Tests/RenderExport.swift in Sources */,
+				00000000000000000000007C /* TurbulenceLab/Tests/UIAutomation.swift in Sources */,
+				00000000000000000000007E /* TurbulenceLab/UI/ControlsView.swift in Sources */,
+				000000000000000000000080 /* TurbulenceLab/UI/DiagnosticsView.swift in Sources */,
+				000000000000000000000082 /* TurbulenceLab/UI/SimulationView.swift in Sources */,
+				000000000000000000000084 /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00000000000000000000009F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000098 /* TurbulenceLab/Metal/MetalResources.swift in Sources */,
+				000000000000000000000099 /* TurbulenceLab/Metal/TurbulenceKernels.metal in Sources */,
+				00000000000000000000009A /* TurbulenceLab/Metal/Visualization.metal in Sources */,
+				00000000000000000000009B /* TurbulenceLab/Simulation/SimulationConfig.swift in Sources */,
+				00000000000000000000009C /* TurbulenceLab/Simulation/SpectralSolver.swift in Sources */,
+				00000000000000000000009D /* TurbulenceLab/Tests/NumericalTests.swift in Sources */,
+				00000000000000000000009E /* TurbulenceLab/VkFFTBridge/VkFFTBridge.mm in Sources */,
+				000000000000000000000097 /* XCTest/SolverTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		00000000000000000000008D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = EB7Y2WHN85;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/VkFFT",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.metalastra.TurbulenceLab;
+				PRODUCT_NAME = TurbulenceLab;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OBJC_BRIDGING_HEADER = TurbulenceLab/VkFFTBridge/VkFFTBridge.h;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		00000000000000000000008E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/VkFFT",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.metalastra.TurbulenceLabTests;
+				PRODUCT_NAME = TurbulenceLabTests;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OBJC_BRIDGING_HEADER = TurbulenceLab/VkFFTBridge/VkFFTBridge.h;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		00000000000000000000008F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		000000000000000000000090 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = EB7Y2WHN85;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/VkFFT",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.metalastra.TurbulenceLab;
+				PRODUCT_NAME = TurbulenceLab;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = TurbulenceLab/VkFFTBridge/VkFFTBridge.h;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		000000000000000000000091 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/Vendor",
+					"$(SRCROOT)/Vendor/VkFFT",
+				);
+				INFOPLIST_KEY_CFBundleDisplayName = "Turbulence Lab";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Metal,
+					"-framework",
+					MetalKit,
+					"-framework",
+					QuartzCore,
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.metalastra.TurbulenceLabTests;
+				PRODUCT_NAME = TurbulenceLabTests;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = TurbulenceLab/VkFFTBridge/VkFFTBridge.h;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		000000000000000000000092 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000000093 /* Build configuration list for PBXNativeTarget "TurbulenceLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000008D /* Debug */,
+				000000000000000000000090 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000094 /* Build configuration list for PBXProject "TurbulenceLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000008F /* Debug */,
+				000000000000000000000092 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0000000000000000000000A1 /* Build configuration list for PBXNativeTarget "TurbulenceLabTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000008E /* Debug */,
+				000000000000000000000091 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0000000000000000000000A3 /* Project object */;
+}
