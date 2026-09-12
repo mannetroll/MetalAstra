@@ -1,0 +1,5 @@
+# forward transform: C2C
+device,size,steps,batch,packed,threads,displayEvery,rendered,repeat,wall_s,ms_step,steps_s,R_turbo,gpu_span_ms_step,cpu_encode_ms_step,energy,enstrophy,dt
+Apple M1 Max,1024,2400,4,yes,256,1,yes,1,5.836952,2.432063,411.174,0.822350,2.431732,0.017030,0.03573062,1.72242379,0.0020000
+Apple M1 Max,1024,2400,4,yes,256,1,yes,2,4.630221,1.929259,518.334,1.036671,1.929081,0.016412,0.03573062,1.72242379,0.0020000
+Apple M1 Max,1024,2400,4,yes,256,1,yes,3,4.460797,1.858665,538.020,1.076044,1.858479,0.016040,0.03573062,1.72242379,0.0020000

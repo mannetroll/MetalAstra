@@ -1,0 +1,3 @@
+UI BENCHMARK: size,wall_s,simulated_s,R_turbo,steps_s,ms_step,FPS,energy,enstrophy
+# drawable 1620x1620; FPS uses actual drawable presentation timestamps
+UI,256,15.208862,141.632004,9.312466,4656.233,0.214766,58.65,0.00177583,0.00621414

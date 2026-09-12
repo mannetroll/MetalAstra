@@ -1,0 +1,78 @@
+2026-09-12 22:18:31.719 TurbulenceLab[60748:5015757] Metal API Validation Enabled
+2026-09-12 22:18:31.719 TurbulenceLab[60748:5015757] Metal GPU Validation Enabled
+NUMERICAL SUITE: forward C2C
+PASS complex FFT forward/inverse max error 7.1525574e-07
+PASS spectral derivative max error 4.053116e-06
+PASS Laplacian max error 3.0517578e-05
+PASS Poisson inversion max error 7.0780516e-08
+PASS velocity u sign max error 1.3411045e-07
+PASS velocity v sign max error 2.2351742e-07
+PASS zero divergence max error 2.3026738e-14
+PASS strict rectangular 2/3 mask 
+PASS safe zero mode inverse 
+PASS zero mean projection 
+PASS out-of-band modes removed 
+PASS deterministic seed 
+PASS distinct seeds 
+PASS inviscid energy conservation relative drift -6.1392784e-06
+PASS inviscid enstrophy conservation 
+PASS viscous kinetic energy decay 
+PASS 700 steps remain finite 
+PASS compensated simulated clock 
+PASS SSP-RK3 convergence error ratio 8.612308, fine 9.685755e-06
+PASS Parseval physical energy 
+PASS physical enstrophy 
+PASS 3 vs 5 transforms per stage max error 4.7683716e-07
+PASS GPU vs independent Double DFT/RK3 max error 4.7683716e-07
+PASS R2C RHS vs Double DFT/RK3 max error 4.7683716e-07
+PASS preset Decaying turbulence 
+PASS preset Vortex gas 
+PASS preset Kelvin–Helmholtz 
+PASS preset Forced inverse cascade 
+PASS GPU CFL lowers dt dt 0.003828814
+PASS GPU vortex injection sign 
+PASS GPU vortex injection zero mean 
+PASS non-finite fault detection 
+PASS forcing Hermitian symmetry and band 
+PASS forcing drives a resting flow 
+ALL 34 NUMERICAL CHECKS PASSED on Apple M1 Max
+NUMERICAL SUITE: forward R2C
+PASS complex FFT forward/inverse max error 7.1525574e-07
+PASS spectral derivative max error 4.053116e-06
+PASS Laplacian max error 3.0517578e-05
+PASS Poisson inversion max error 7.0780516e-08
+PASS velocity u sign max error 1.3411045e-07
+PASS velocity v sign max error 2.2351742e-07
+PASS zero divergence max error 2.3026738e-14
+PASS strict rectangular 2/3 mask 
+PASS safe zero mode inverse 
+PASS zero mean projection 
+PASS out-of-band modes removed 
+PASS deterministic seed 
+PASS distinct seeds 
+PASS inviscid energy conservation relative drift -6.1392784e-06
+PASS inviscid enstrophy conservation 
+PASS viscous kinetic energy decay 
+PASS 700 steps remain finite 
+PASS compensated simulated clock 
+PASS SSP-RK3 convergence error ratio 8.612308, fine 9.685755e-06
+PASS Parseval physical energy 
+PASS physical enstrophy 
+PASS 3 vs 5 transforms per stage max error 4.7683716e-07
+PASS GPU vs independent Double DFT/RK3 max error 4.7683716e-07
+PASS R2C RHS vs Double DFT/RK3 max error 4.7683716e-07
+PASS preset Decaying turbulence 
+PASS preset Vortex gas 
+PASS preset Kelvin–Helmholtz 
+PASS preset Forced inverse cascade 
+PASS GPU CFL lowers dt dt 0.003828814
+PASS GPU vortex injection sign 
+PASS GPU vortex injection zero mean 
+PASS non-finite fault detection 
+PASS forcing Hermitian symmetry and band 
+PASS forcing drives a resting flow 
+PASS R2C vs C2C at 256² max error 9.536743e-07
+PASS R2C vs C2C at 512² max error 9.536743e-07
+PASS R2C vs C2C at 1024² max error 1.1920929e-06
+PASS R2C vs C2C at 2048² max error 1.4305115e-06
+ALL 38 NUMERICAL CHECKS PASSED on Apple M1 Max

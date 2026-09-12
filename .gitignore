@@ -1,0 +1,36 @@
+# Xcode build output, archives, and test results.
+build/
+DerivedData/
+*.app/
+*.xcarchive/
+*.xcresult
+*.dSYM/
+*.dSYM.zip
+
+# Compiled Metal shaders.
+*.air
+*.metallib
+
+# Xcode per-user state. Keep project files, workspaces, and shared schemes.
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+
+# Instruments and Metal debugger captures.
+*.trace
+*.gputrace
+
+# Local runs from the scripts and README examples.
+# Keep recorded benchmark CSVs, validation reports, and reference images.
+/Benchmarks/local-*.csv
+/Benchmarks/my-ui-run.txt
+/Benchmarks/ui-smoke-errors.txt
+
+# macOS metadata and editor temporary files.
+.DS_Store
+._*
+*.swp
+*.swo
+*~

@@ -1,0 +1,9 @@
+ISOLATED GPU PHASE PROFILE — extra commits/waits perturb scheduling; ms per step
+RK update: 0.45225416542962193
+clock: 0.0046416709665209055
+forward FFT: 0.2158916788175702
+inverse FFTs: 0.5833416769746691
+nonlinear + CFL: 0.18114998820237815
+rendering: 0.15647081891074777
+spectral: 0.30401666299439967
+visualization + diagnostics: 0.3480583429336548

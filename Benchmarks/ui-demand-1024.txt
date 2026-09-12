@@ -1,0 +1,2 @@
+UI BENCHMARK: size,wall_s,simulated_s,R_turbo,steps_s,ms_step,FPS,energy,enstrophy
+UI,1024,30.038590,33.716728,1.122447,561.145,1.782071,59.28,0.01753726,0.20953429
